@@ -117,11 +117,11 @@ static ae2f_inline ae2f_ccconst __result __one_const(
 			return RET;
 
 		case LIBDICE_OPCODE_JMPA:
-			RET.m_ctx.m_pc	+= c_oprand;
+			RET.m_ctx.m_pc	+= c_oprand - 4;
 			return RET;
 
 		case LIBDICE_OPCODE_JMPN:
-			RET.m_ctx.m_pc	-= c_oprand;
+			RET.m_ctx.m_pc	-= c_oprand + 4;
 			return RET;
 
 			{
@@ -302,7 +302,7 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 
 		case LIBDICE_OPCODE_JMPZN:
 			RET.m_ctx.m_pc -= c_oprand
-				? RET.m_ctx.m_pc - 6
+				? RET.m_ctx.m_pc + 6
 				: 0;
 			return RET;
 
