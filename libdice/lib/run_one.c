@@ -96,6 +96,7 @@ static ae2f_inline ae2f_ccconst __result __one_const(
 
 	RET.m_ctx	= c_ctx;
 	RET.m_ctx.m_pc	+= 4;
+	RET.m_r0	^= RET.m_r0;
 
 	switch(c_opcode) {
 		case LIBDICE_OPCODE_BNOT:
@@ -169,6 +170,7 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 	RET.m_ctx	= c_ctx;
 	/** opcode dst nref val nref val */
 	RET.m_ctx.m_pc	+= 6;
+	RET.m_r0	^= RET.m_r0;
 
 	union { 
 		float m_f32;
@@ -188,6 +190,10 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 			ae2f_fallthrough;
 		default: break;
 	}
+
+			VAL0.m_u32 = c_oprand;
+			VAL1.m_u32 = c_op1;
+
 
 	switch(c_opcode) {
 		case LIBDICE_OPCODE_EQ:
@@ -350,6 +356,8 @@ DICEIMPL libdice_ctx libdice_run_one(
 	assert(rd_interface_put->m_pfn_putf);
 	assert(rd_interface_put->m_pfn_putu);
 	assert(rd_interface_put->m_pfn_puti);
+
+	(void)rdwr_lookup;
 
 	ae2f_unexpected_but_if(c_ctx.m_state != LIBDICE_CTX_GOOD) { return c_ctx; }
 	ae2f_expected_but_else(c_ctx.m_pc < c_num_programme) {
