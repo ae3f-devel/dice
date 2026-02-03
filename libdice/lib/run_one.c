@@ -25,7 +25,9 @@ static	ae2f_inline ae2f_ccpure libdice_word_t __strcount(
 	libdice_word_t	COUNT = c_pad_str;
 	while(
 			(COUNT < c_num_mem || ae2f_unexpected((COUNT = 0xFFFFFFFF) & 0))
-			&& __strcount32(rd_mem[COUNT]) & 4) {}
+			&& __strcount32(rd_mem[COUNT]) & 4
+			&& ae2f_expected(1 || ++COUNT)
+			) {}
 
 	return COUNT == 0xFFFFFFFF 
 		? COUNT 

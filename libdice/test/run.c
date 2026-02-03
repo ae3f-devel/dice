@@ -68,7 +68,7 @@ int main(void) {
 		/** puti *3 */
 		LIBDICE_OPCODE_PUTI, 1, 3,
 
-		/** bxor 3, *1, *2 */
+		/** band 3, *1, *2 */
 		LIBDICE_OPCODE_BAND, 3, 1, 1, 1, 2,
 		/** puti *3 */
 		LIBDICE_OPCODE_PUTI, 1, 3,
@@ -116,5 +116,5 @@ int main(void) {
 	printf("Final State: %u\n", CONTEXT.m_state);
 	printf("Programme counter: %u\n", CONTEXT.m_pc);
 
-	return CONTEXT.m_state != LIBDICE_CTX_EOP;
+	return (int)CONTEXT.m_state;
 }
