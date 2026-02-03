@@ -85,6 +85,7 @@ int main(void) {
 		LIBDICE_OPCODE_SET, 0, *(const libdice_word_t*)(const void*)"hi\0\0",
 		/** puts 0 */
 		LIBDICE_OPCODE_PUTS, 0, 0,
+		LIBDICE_OPCODE_EOP,
 	};
 	libdice_put_interface	INTERFACE;
 
