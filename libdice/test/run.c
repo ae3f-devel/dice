@@ -75,7 +75,7 @@ int main(void) {
 
 		/** putc '\n' */
 		LIBDICE_OPCODE_PUTC, 0, '\n',
-		LIBDICE_OPCODE_JMPZA, 0, 0, 0, 2,
+		LIBDICE_OPCODE_JMPZA, 0, 0, 0, 6,
 
 		/** now this is skipped */
 		LIBDICE_OPCODE_EOP,

@@ -295,14 +295,14 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 
 		case LIBDICE_OPCODE_JMPZA:
 			RET.m_ctx.m_pc += c_oprand
-				? RET.m_ctx.m_pc
+				? RET.m_ctx.m_pc - 6
 				: 0;
 
 			return RET;
 
 		case LIBDICE_OPCODE_JMPZN:
 			RET.m_ctx.m_pc -= c_oprand
-				? RET.m_ctx.m_pc
+				? RET.m_ctx.m_pc - 6
 				: 0;
 			return RET;
 
