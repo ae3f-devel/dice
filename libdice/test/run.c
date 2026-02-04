@@ -122,7 +122,7 @@ int main(void) {
 			, LOOKUP, sizeof(LOOKUP) / sizeof(LOOKUP[0])
 			);
 
-	printf("Final State: %u\n", CONTEXT.m_state);
+	printf("\nFinal State: %u\n", CONTEXT.m_state);
 	printf("Programme counter: %u\n", CONTEXT.m_pc);
 
 	return (int)CONTEXT.m_state;
