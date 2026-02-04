@@ -108,7 +108,7 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_JMPN,
 
 	/**
-	 * @brief jumps to wanted location when condition is 0.
+	 * @brief jumps to wanted location when condition is 1.
 	 * @details jmpz nref cnd nref dst
 	 * */
 	LIBDICE_OPCODE_JMPZ,
@@ -117,37 +117,37 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief bitand
-	 * @details band dst nref val nref2 val2
+	 * @details band dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_BAND,
 
 	/**
 	 * @brief bitor
-	 * @details bor dst nref val nref2 val2
+	 * @details bor dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_BOR,
 
 	/**
 	 * @brief bitxor
-	 * @details bxor dst nref val nref2 val2
+	 * @details bxor dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_BXOR,
 
 	/**
 	 * @brief bit left shift
-	 * @details blshift dst nref val nref2 val2
+	 * @details blshift dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_BLSHIFT,
 
 	/**
 	 * @brief bit right shift
-	 * @details brshift dst nref val nref2 val2
+	 * @details brshift dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_BRSHIFT,
 
 	/**
 	 * @brief logicwise right shift
-	 * @details lrshift dst nref val nref2 val2
+	 * @details lrshift dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_LRSHIFT,
 
@@ -159,13 +159,13 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief logical and
-	 * @details land dst nref val nref2 val2
+	 * @details land dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_LAND,
 
 	/**
 	 * @brief logical or
-	 * @details lor dst nref val nref2 val2
+	 * @details lor dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_LOR,
 
@@ -186,7 +186,7 @@ enum LIBDICE_OPCODE_ {
 	 * @brief 
 	 * check if two values are equal.
 	 * result will be normalised to bool.
-	 * @details eq dst nref val nref2 val2
+	 * @details eq dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_EQ,
 
@@ -194,7 +194,7 @@ enum LIBDICE_OPCODE_ {
 	 * @brief 
 	 * check if two values are not equal.
 	 * result will be normalised to bool.
-	 * @details eq dst nref val nref2 val2
+	 * @details eq dst nref val nref3 val2
 	 * */
 	LIBDICE_OPCODE_NEQ,
 	/**
@@ -220,10 +220,10 @@ enum LIBDICE_OPCODE_ {
 	 * @brief	Integer Greater Than
 	 * @details	
 	 * ```
-	 * igt dst nref val nref2 val2
+	 * igt dst nref val nref3 val2
 	 * ```
 	 *
-	 * would be val > val2 as int
+	 * would be val > val3 as int
 	 * */
 	LIBDICE_OPCODE_IGT,
 
@@ -231,10 +231,10 @@ enum LIBDICE_OPCODE_ {
 	 * @brief	Floating point Greater Than
 	 * @details	
 	 * ```
-	 * fgt dst nref val nref2 val2
+	 * fgt dst nref val nref3 val2
 	 * ```
 	 *
-	 * would be val > val2 as float
+	 * would be val > val3 as float
 	 * */
 	LIBDICE_OPCODE_FGT,
 
@@ -242,10 +242,10 @@ enum LIBDICE_OPCODE_ {
 	 * @brief	Floating point Lesser Than
 	 * @details	
 	 * ```
-	 * ilt dst nref val nref2 val2
+	 * ilt dst nref val nref3 val2
 	 * ```
 	 *
-	 * would be val < val2 as int
+	 * would be val < val3 as int
 	 * */
 	LIBDICE_OPCODE_ILT,
 
@@ -253,17 +253,32 @@ enum LIBDICE_OPCODE_ {
 	 * @brief	Floating point Lesser Than
 	 * @details	
 	 * ```
-	 * flt dst nref val nref2 val2
+	 * flt dst nref val nref3 val2
 	 * ```
 	 *
-	 * would be val < val2 as float
+	 * would be val < val3 as float
 	 * */
 	LIBDICE_OPCODE_FLT,
 
 	LIBDICE_OPCODE_SAVE,
 	LIBDICE_OPCODE_LOAD,
 
+	/**
+	 * @brief	define a lookup (dictionary) entry
+	 * @details
+	 * DEF dst nref key value
+	 * - dst: RAM index which will receive the entry id (entry number)
+	 * - key: nref (count + index) pointing to key (uses same deref format as other ops)
+	 * - value: immediate value to store with the key
+	 */
 	LIBDICE_OPCODE_DEF,
+
+	/**
+	 * @brief	undefine (remove) a lookup entry
+	 * @details
+	 * UNDEF dst nref key
+	 * - dst: RAM index which will receive result (1 if removed else 0)
+	 */
 	LIBDICE_OPCODE_UNDEF,
 
 	/**

@@ -564,6 +564,83 @@ DICEIMPL libdice_ctx libdice_run_one(
 				 c_ctx.m_pc += 3;
 				 return c_ctx;
 			 }
+
+		/* DEF: DEF dst nref key value
+		 * layout: opcode, dst, nref_count, nref_index, value
+		 * Writes a (key, value) pair into rdwr_lookup and stores entry id into RAM[dst].
+		 */
+		case LIBDICE_OPCODE_DEF:
+			 /* need at least dst + nref(count,index) + value => total 5 words */
+			 ae2f_expected_but_else(c_ctx.m_pc + 3 < c_num_programme) {
+				 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+				 return c_ctx;
+			 }
+
+			 __deref(O0, 2); /* resolve key */
+
+			 /* check space for two words (key, value) */
+			 if (c_ctx.m_lookup_used + 2 > c_num_lookup) {
+				 c_ctx.m_state = LIBDICE_CTX_LOOKUP_LEAK;
+				 return c_ctx;
+			 }
+
+			 /* store key and immediate value */
+			 rdwr_lookup[c_ctx.m_lookup_used] = O0;
+			 rdwr_lookup[c_ctx.m_lookup_used + 1] = rd_programme[c_ctx.m_pc + 4];
+
+			 ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram) {
+				 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+				 return c_ctx;
+			 }
+
+			 /* return entry id (entry number) in dst RAM */
+			 rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = (libdice_word_t)(c_ctx.m_lookup_used / 2);
+			 c_ctx.m_lookup_used += 2;
+			 c_ctx.m_pc += 5;
+			 return c_ctx;
+
+		/* UNDEF: UNDEF dst nref key
+		 * layout: opcode, dst, nref_count, nref_index
+		 * Removes matching key entries and returns 1 in RAM[dst] if removed, else 0.
+		 */
+		case LIBDICE_OPCODE_UNDEF:
+			 ae2f_expected_but_else(c_ctx.m_pc + 2 < c_num_programme) {
+				 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+				 return c_ctx;
+			 }
+
+			 __deref(O0, 2); /* resolve key */
+
+			 {
+				 libdice_word_t	IDX = 0;
+				 libdice_word_t	FOUND = 0;
+
+				 for (; IDX + 1 < c_ctx.m_lookup_used; IDX += 2) {
+					 if (rdwr_lookup[IDX] == O0) {
+						 FOUND = 1;
+						 break;
+					 }
+				 }
+
+				 if (FOUND) {
+					 /* shift remaining entries left by two words */
+					 for (libdice_word_t K = IDX; K + 2 < c_ctx.m_lookup_used; K += 2) {
+						 rdwr_lookup[K] = rdwr_lookup[K + 2];
+						 rdwr_lookup[K + 1] = rdwr_lookup[K + 3];
+					 }
+					 c_ctx.m_lookup_used -= 2;
+				 }
+
+				 ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram) {
+					 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+					 return c_ctx;
+				 }
+
+				 rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = FOUND;
+			 }
+
+			 c_ctx.m_pc += 4;
+			 return c_ctx;
 	}
 
 	c_ctx.m_state = LIBDICE_CTX_OPINVAL;
