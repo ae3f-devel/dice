@@ -108,7 +108,7 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_JMPN,
 
 	/**
-	 * @brief jumps to wanted location when condition is 1.
+	 * @brief jumps to wanted location when condition is 0.
 	 * @details jmpz nref cnd nref dst
 	 * */
 	LIBDICE_OPCODE_JMPZ,
@@ -117,37 +117,37 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief bitand
-	 * @details band dst nref val nref3 val2
+	 * @details band dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_BAND,
 
 	/**
 	 * @brief bitor
-	 * @details bor dst nref val nref3 val2
+	 * @details bor dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_BOR,
 
 	/**
 	 * @brief bitxor
-	 * @details bxor dst nref val nref3 val2
+	 * @details bxor dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_BXOR,
 
 	/**
 	 * @brief bit left shift
-	 * @details blshift dst nref val nref3 val2
+	 * @details blshift dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_BLSHIFT,
 
 	/**
 	 * @brief bit right shift
-	 * @details brshift dst nref val nref3 val2
+	 * @details brshift dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_BRSHIFT,
 
 	/**
 	 * @brief logicwise right shift
-	 * @details lrshift dst nref val nref3 val2
+	 * @details lrshift dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_LRSHIFT,
 
@@ -159,13 +159,13 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief logical and
-	 * @details land dst nref val nref3 val2
+	 * @details land dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_LAND,
 
 	/**
 	 * @brief logical or
-	 * @details lor dst nref val nref3 val2
+	 * @details lor dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_LOR,
 
