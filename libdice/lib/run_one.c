@@ -625,7 +625,7 @@ case LIBDICE_OPCODE_DEF:
 				 }
 
 				 ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram) {
-					 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+					 c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
 					 return c_ctx;
 				 }
 
