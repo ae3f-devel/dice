@@ -1,5 +1,4 @@
 .*
 build/
 Testing/
-*.log
-*.tmp
+.vscode/
