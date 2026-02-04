@@ -186,7 +186,7 @@ enum LIBDICE_OPCODE_ {
 	 * @brief 
 	 * check if two values are equal.
 	 * result will be normalised to bool.
-	 * @details eq dst nref val nref3 val2
+	 * @details eq dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_EQ,
 
