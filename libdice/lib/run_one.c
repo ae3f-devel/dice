@@ -565,39 +565,32 @@ DICEIMPL libdice_ctx libdice_run_one(
 				 return c_ctx;
 			 }
 
-		/* DEF: DEF dst nref key value
-		 * layout: opcode, dst, nref_count, nref_index, value
-		 * Writes a (key, value) pair into rdwr_lookup and stores entry id into RAM[dst].
-		 */
-		case LIBDICE_OPCODE_DEF:
-			 /* need at least dst + nref(count,index) + value => total 5 words */
-			 ae2f_expected_but_else(c_ctx.m_pc + 3 < c_num_programme) {
-				 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
-				 return c_ctx;
-			 }
+case LIBDICE_OPCODE_DEF:
+		ae2f_expected_but_else(c_ctx.m_pc + 4 < c_num_programme) {
+			c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+			return c_ctx;
+		}
 
-			 __deref(O0, 2); /* resolve key */
+		__deref(O0, 2);
+		__deref(O1, 4);
 
-			 /* check space for two words (key, value) */
-			 if (c_ctx.m_lookup_used + 2 > c_num_lookup) {
-				 c_ctx.m_state = LIBDICE_CTX_LOOKUP_LEAK;
-				 return c_ctx;
-			 }
+		if (c_ctx.m_lookup_used + 2 > c_num_lookup) {
+			c_ctx.m_state = LIBDICE_CTX_LOOKUP_LEAK;
+			return c_ctx;
+		}
 
-			 /* store key and immediate value */
-			 rdwr_lookup[c_ctx.m_lookup_used] = O0;
-			 rdwr_lookup[c_ctx.m_lookup_used + 1] = rd_programme[c_ctx.m_pc + 4];
+		rdwr_lookup[c_ctx.m_lookup_used] = O0;
+		rdwr_lookup[c_ctx.m_lookup_used + 1] = O1;
 
-			 ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram) {
-				 c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
-				 return c_ctx;
-			 }
+		ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram) {
+			c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
+			return c_ctx;
+		}
 
-			 /* return entry id (entry number) in dst RAM */
-			 rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = (libdice_word_t)(c_ctx.m_lookup_used / 2);
-			 c_ctx.m_lookup_used += 2;
-			 c_ctx.m_pc += 5;
-			 return c_ctx;
+		rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = (libdice_word_t)(c_ctx.m_lookup_used / 2);
+		c_ctx.m_lookup_used += 2;
+		c_ctx.m_pc += 6;
+		return c_ctx;
 
 		/* UNDEF: UNDEF dst nref key
 		 * layout: opcode, dst, nref_count, nref_index

@@ -81,18 +81,12 @@ int main(void) {
 		LIBDICE_OPCODE_EOP,
 		/** ============================= */
 
-		/** set 0, ???; "hi" as uint32 */
 		LIBDICE_OPCODE_SET, 0, *(const libdice_word_t*)(const void*)"hi\0\0",
-		/** puts 0 */
 		LIBDICE_OPCODE_PUTS, 0, 0,
-		/* dictionary test: set RAM[0]=42; define entry for key 0 with value 999, write entry id to RAM[1] */
 		LIBDICE_OPCODE_SET, 0, 42,
-		LIBDICE_OPCODE_DEF, 1, 0, 0, 999,
-		/* puti *1 => should print entry id (0) */
+		LIBDICE_OPCODE_DEF, 1, 1, 0, 1, 0,
 		LIBDICE_OPCODE_PUTI, 1, 1,
-		/* undef the key, write result to RAM[2] */
-		LIBDICE_OPCODE_UNDEF, 2, 0, 0,
-		/* puti *2 => should print 1 (success) */
+		LIBDICE_OPCODE_UNDEF, 2, 1, 0,
 		LIBDICE_OPCODE_PUTI, 1, 2,
 		LIBDICE_OPCODE_EOP,
 	};
