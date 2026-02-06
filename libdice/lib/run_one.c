@@ -340,7 +340,7 @@ DICEIMPL libdice_ctx libdice_run_one(
 	assert(rd_interface_put->m_pfn_putf);
 	assert(rd_interface_put->m_pfn_putu);
 	assert(rd_interface_put->m_pfn_puti);
-	assert(c_num_lookup >= LIBDICE_LOOKUP_SECTION_LEN);
+	assert(c_num_lookup >= LIBDICE_LOOKUP_SECTION_WORD_LEN);
 
 	(void)rdwr_lookup;
 
@@ -544,11 +544,21 @@ DICEIMPL libdice_ctx libdice_run_one(
 		/*
 		 * The key is nul-terminated
 		 */
-		libdice_word_t key_len = 0;
+		libdice_word_t key_byte_len = 0;
+		libdice_word_t key_word_len = 0;
 		libdice_word_t i = 0;
-		libdice_word_t tmp_key_len = 0;
+		libdice_word_t tmp_key_byte_len = 0;
+		unsigned char *tmp_ptr_uchar = NULL;
+		libdice_word_t *rdwr_lookup_offset_1byte = NULL;
+		unsigned char *rdwr_lookup_uchar = NULL;
 
-		ae2f_unexpected_but_if(c_ctx.m_lookup_used + LIBDICE_LOOKUP_SECTION_LEN > c_num_lookup)
+		tmp_ptr_uchar = (unsigned char *)rdwr_lookup;
+		tmp_ptr_uchar++;
+		rdwr_lookup_offset_1byte = (libdice_word_t *)tmp_ptr_uchar;
+
+		rdwr_lookup_uchar = (unsigned char *)rdwr_lookup;
+
+		ae2f_unexpected_but_if(c_ctx.m_lookup_used + LIBDICE_LOOKUP_SECTION_WORD_LEN > c_num_lookup)
 		{
 			c_ctx.m_state = LIBDICE_CTX_LOOKUP_LEAK;
 			return c_ctx;
@@ -556,38 +566,39 @@ DICEIMPL libdice_ctx libdice_run_one(
 
 		__deref(O0, 1); /* pointer to key */
 
-		key_len = __strcount(rdwr_ram, c_num_ram, O0);
-		if (key_len == 0xFFFFFFFF)
+		key_byte_len = __strcount(rdwr_ram, c_num_ram, O0);
+		if (key_byte_len == 0xFFFFFFFF)
 		{
 			c_ctx.m_state = LIBDICE_CTX_STRINVAL;
 			return c_ctx;
 		}
-		else if (key_len > LIBDICE_LOOKUP_KEY_MAX_LEN || key_len % 4 != 0)
+		else if (key_byte_len > LIBDICE_LOOKUP_KEY_MAX_LEN)
 		{
 			c_ctx.m_state = LIBDICE_CTX_KEYLENINVAL;
 			return c_ctx;
 		}
-		key_len /= 4;
+		key_word_len = key_byte_len / 4 + !!(key_byte_len % 4);
 
-		if (c_num_ram < O0 + key_len)
+		if (c_num_ram < O0 + key_word_len)
 		{
 			c_ctx.m_state = LIBDICE_CTX_STRINVAL;
 			return c_ctx;
 		}
 
 		/* find same key */
-		for (i = 0; i < c_ctx.m_lookup_used; i += LIBDICE_LOOKUP_SECTION_LEN)
+		for (i = 0; i < c_ctx.m_lookup_used; i += LIBDICE_LOOKUP_SECTION_WORD_LEN)
 		{
-			tmp_key_len = rdwr_lookup[i];
 
-			ae2f_expected_if(tmp_key_len != key_len)
+			tmp_key_byte_len = rdwr_lookup_uchar[i * 4];
+
+			ae2f_expected_if(tmp_key_byte_len != key_byte_len)
 			{
 				continue;
 			}
 
 			ae2f_expected_if(!__strequal2(rdwr_ram, c_num_ram,
-						      rdwr_lookup, c_num_lookup,
-						      O0, i + LIBDICE_LOOKUP_METADATA_LEN))
+						      rdwr_lookup_offset_1byte, c_num_lookup,
+						      O0, i))
 			{
 				continue;
 			}
@@ -597,13 +608,14 @@ DICEIMPL libdice_ctx libdice_run_one(
 			return c_ctx;
 		}
 
-		rdwr_lookup[c_ctx.m_lookup_used] = key_len;
+		rdwr_lookup_uchar[c_ctx.m_lookup_used * 4] = key_byte_len;
 
-		for (i = 0; i < key_len; i++)
+		/* copy key */
+		for (i = 0; i < key_word_len; i++)
 		{
-			rdwr_lookup[c_ctx.m_lookup_used + LIBDICE_LOOKUP_METADATA_LEN + i] = rdwr_ram[O0 + i];
+			rdwr_lookup_offset_1byte[c_ctx.m_lookup_used + i] = rdwr_ram[O0 + i];
 		}
-		c_ctx.m_lookup_used += LIBDICE_LOOKUP_SECTION_LEN;
+		c_ctx.m_lookup_used += LIBDICE_LOOKUP_SECTION_WORD_LEN;
 
 		c_ctx.m_pc += 3;
 		return c_ctx;
@@ -612,58 +624,71 @@ DICEIMPL libdice_ctx libdice_run_one(
 	case LIBDICE_OPCODE_UNDEF:
 	{
 
-		libdice_word_t key_len = 0;
+		libdice_word_t key_byte_len = 0;
+		libdice_word_t key_word_len = 0;
 		libdice_word_t i = 0;
+		libdice_word_t tmp_key_byte_len = 0;
+		unsigned char *tmp_ptr_uchar = NULL;
+		libdice_word_t *rdwr_lookup_offset_1byte = NULL;
+		unsigned char *rdwr_lookup_uchar = NULL;
 		libdice_word_t j = 0;
-		libdice_word_t tmp_key_len = 0;
+
+		tmp_ptr_uchar = (unsigned char *)rdwr_lookup;
+		tmp_ptr_uchar++;
+		rdwr_lookup_offset_1byte = (libdice_word_t *)tmp_ptr_uchar;
+
+		rdwr_lookup_uchar = (unsigned char *)rdwr_lookup;
 
 		__deref(O0, 1); /*pointer to key*/
 
-		key_len = __strcount(rdwr_ram, c_num_ram, O0);
-		if (key_len == 0xFFFFFFFF)
+		key_byte_len = __strcount(rdwr_ram, c_num_ram, O0);
+		if (key_byte_len == 0xFFFFFFFF)
 		{
 			c_ctx.m_state = LIBDICE_CTX_STRINVAL;
 			return c_ctx;
 		}
-		else if (key_len > LIBDICE_LOOKUP_KEY_MAX_LEN || key_len % 4 != 0)
+		else if (key_byte_len > LIBDICE_LOOKUP_KEY_MAX_LEN)
 		{
 			c_ctx.m_state = LIBDICE_CTX_KEYLENINVAL;
 			return c_ctx;
 		}
+		key_word_len = key_byte_len / 4 + !!(key_byte_len % 4);
 
-		key_len /= 4;
-
-		for (i = 0; i < c_ctx.m_lookup_used; i += LIBDICE_LOOKUP_SECTION_LEN)
+		/* find same key */
+		for (i = 0; i < c_ctx.m_lookup_used; i += LIBDICE_LOOKUP_SECTION_WORD_LEN)
 		{
-			tmp_key_len = rdwr_lookup[i];
 
-			ae2f_expected_if(tmp_key_len != key_len)
+			tmp_key_byte_len = rdwr_lookup_uchar[i * 4];
+
+			ae2f_expected_if(tmp_key_byte_len != key_byte_len)
 			{
 				continue;
 			}
 
 			ae2f_expected_if(!__strequal2(rdwr_ram, c_num_ram,
-						      rdwr_lookup, c_num_lookup,
-						      O0, i + LIBDICE_LOOKUP_METADATA_LEN))
+						      rdwr_lookup_offset_1byte, c_num_lookup,
+						      O0, i))
 			{
 				continue;
 			}
 
+			/* found same key */
 			break;
 		}
 
 		if (i == c_ctx.m_lookup_used)
 		{
+			/* Couldn't find the same key */
 			c_ctx.m_pc += 3;
 			return c_ctx;
 		}
 
-		for (j = 0; j < LIBDICE_LOOKUP_SECTION_LEN; j++)
+		for (j = 0; j < LIBDICE_LOOKUP_SECTION_WORD_LEN; j++)
 		{
-			rdwr_lookup[i + j] = rdwr_lookup[c_ctx.m_lookup_used - LIBDICE_LOOKUP_SECTION_LEN + j];
+			rdwr_lookup[i + j] = rdwr_lookup[c_ctx.m_lookup_used - LIBDICE_LOOKUP_SECTION_WORD_LEN + j];
 		}
 
-		c_ctx.m_lookup_used -= LIBDICE_LOOKUP_SECTION_LEN;
+		c_ctx.m_lookup_used -= LIBDICE_LOOKUP_SECTION_WORD_LEN;
 		c_ctx.m_pc += 3;
 		return c_ctx;
 	}
