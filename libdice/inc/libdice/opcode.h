@@ -6,10 +6,10 @@
 /**
  *
  * */
-enum LIBDICE_OPCODE_ {
+enum LIBDICE_OPCODE_
+{
 
-
-	/** 
+	/**
 	 * @brief do nothing.
 	 * @details nop
 	 * */
@@ -89,13 +89,13 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief negates an integer
-	 * @details ineg dst nref val 
+	 * @details ineg dst nref val
 	 * */
 	LIBDICE_OPCODE_INEG,
 
 	/**
 	 * @brief negates a floating point
-	 * @details fneg dst nref val 
+	 * @details fneg dst nref val
 	 * */
 	LIBDICE_OPCODE_FNEG,
 
@@ -169,7 +169,6 @@ enum LIBDICE_OPCODE_ {
 	 * */
 	LIBDICE_OPCODE_LOR,
 
-
 	/**
 	 * @brief logical not
 	 * @details lnot dst nref val
@@ -183,7 +182,7 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_TOBIT,
 
 	/**
-	 * @brief 
+	 * @brief
 	 * check if two values are equal.
 	 * result will be normalised to bool.
 	 * @details eq dst nref val nref2 val2
@@ -191,7 +190,7 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_EQ,
 
 	/**
-	 * @brief 
+	 * @brief
 	 * check if two values are not equal.
 	 * result will be normalised to bool.
 	 * @details eq dst nref val nref2 val2
@@ -218,7 +217,7 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief	Integer Greater Than
-	 * @details	
+	 * @details
 	 * ```
 	 * igt dst nref val nref2 val2
 	 * ```
@@ -229,7 +228,7 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief	Floating point Greater Than
-	 * @details	
+	 * @details
 	 * ```
 	 * fgt dst nref val nref2 val2
 	 * ```
@@ -240,7 +239,7 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief	Floating point Lesser Than
-	 * @details	
+	 * @details
 	 * ```
 	 * ilt dst nref val nref2 val2
 	 * ```
@@ -251,7 +250,7 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief	Floating point Lesser Than
-	 * @details	
+	 * @details
 	 * ```
 	 * flt dst nref val nref2 val2
 	 * ```
@@ -262,9 +261,6 @@ enum LIBDICE_OPCODE_ {
 
 	LIBDICE_OPCODE_SAVE,
 	LIBDICE_OPCODE_LOAD,
-
-	LIBDICE_OPCODE_DEF,
-	LIBDICE_OPCODE_UNDEF,
 
 	/**
 	 * @brief	puts string in terminal
@@ -296,7 +292,17 @@ enum LIBDICE_OPCODE_ {
 	 * */
 	LIBDICE_OPCODE_PUTF,
 
-	/** 
+	/**
+	 * @details def nref key_ptr
+	 * */
+	LIBDICE_OPCODE_DEF,
+
+	/**
+	 * @details undef nref key_ptr
+	 * */
+	LIBDICE_OPCODE_UNDEF,
+
+	/**
 	 * @brief end of programme
 	 * @details nop
 	 * */
