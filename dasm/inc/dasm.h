@@ -27,6 +27,7 @@ enum DASM_ {
  * 	is `ret_opt`'s available count as word
  * */
 ae2f_extern DICECALL libdice_word_t dasm(
+		enum DASM_* ae2f_restrict const				r_state_opt,
 		ae2f_LP(c_num_ret) libdice_word_t* ae2f_restrict	ret_opt,
 		const libdice_word_t					c_num_ret,
 		ae2f_LP(c_num_str) const char* ae2f_restrict		rd_str,
