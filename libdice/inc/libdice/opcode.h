@@ -331,7 +331,7 @@ enum LIBDICE_OPCODE_
 	 * */
 	LIBDICE_OPCODE_FRAND,
 
-	
+
 	/**
 	 * @brief end of programme
 	 * @details nop

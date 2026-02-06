@@ -22,24 +22,24 @@ typedef libdice_word_t E_LIBDICE_CTX_t;
 typedef struct a_libdice_data *ae2f_restrict h_libdice_data;
 
 typedef E_LIBDICE_CTX_t fn_libdice_puts_t(
-    const libdice_word_t *ae2f_restrict rd_words,
-    h_libdice_data h_data);
+		const libdice_word_t *ae2f_restrict rd_words,
+		h_libdice_data h_data);
 
 typedef E_LIBDICE_CTX_t fn_libdice_putc_t(
-    int c_char,
-    h_libdice_data h_data);
+		int c_char,
+		h_libdice_data h_data);
 
 typedef E_LIBDICE_CTX_t fn_libdice_puti_t(
-    i32_least c_i32,
-    h_libdice_data h_data);
+		i32_least c_i32,
+		h_libdice_data h_data);
 
 typedef E_LIBDICE_CTX_t fn_libdice_putu_t(
-    libdice_word_t c_u32,
-    h_libdice_data h_data);
+		libdice_word_t c_u32,
+		h_libdice_data h_data);
 
 typedef E_LIBDICE_CTX_t fn_libdice_putf_t(
-    float c_f32,
-    h_libdice_data h_data);
+		float c_f32,
+		h_libdice_data h_data);
 
 typedef struct
 {

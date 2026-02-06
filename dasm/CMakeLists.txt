@@ -25,23 +25,19 @@ endif()
 cmake_minimum_required(VERSION 3.10)
 project(libdice VERSION 0)
 
-file(GLOB_RECURSE libdice_c ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)
-file(GLOB_RECURSE libdice_h ${CMAKE_CURRENT_SOURCE_DIR}/inc/*)
+file(GLOB_RECURSE asmdice_c ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)
+file(GLOB_RECURSE asmdice_h ${CMAKE_CURRENT_SOURCE_DIR}/inc/*)
 
-if(NOT DEFINED LIBDICE_LOOKUP_SECTION_WORD_LEN)
-	set(LIBDICE_LOOKUP_SECTION_WORD_LEN 32)
+ae2f_CoreLibFetchX(ae2f Core main)
+
+if(NOT TARGET ae3f::libdice)
+	ae2f_CoreLibFetchX(ae3f dice master)
 endif()
 
-ae2f_CoreLibTentConfigCustom(libdice STATIC inc ae3f ${ae2f_ProjRoot}/cfg/libdice.cmake.in
-	${libdice_c} ${libdice_h}
+ae2f_CoreLibTentConfigCustom(dasm STATIC inc ae3f ${ae2f_ProjRoot}/cfg/dasm.cmake.in
+	${asmdice_c} ${asmdice_h}
 	)
 
-configure_file(
-	${PROJECT_SOURCE_DIR}/inc/libdice/lookup.h.in
-	${PROJECT_SOURCE_DIR}/inc/libdice/.lookup.h
-	)
-
-target_link_libraries(ae3f-libdice ae2f::Core)
-ae2f_UltraErrWERROR(ae3f-libdice PRIVATE)
-
-ae2f_CoreTestTentVerbose(ae3f-libdice test)
+target_link_libraries(ae3f-dasm ae3f::libdice)
+ae2f_UltraErrWERROR(ae3f-dasm PRIVATE)
+ae2f_CoreTestTentVerbose(ae3f-dasm test)
