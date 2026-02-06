@@ -81,13 +81,10 @@ int main(void) {
 		LIBDICE_OPCODE_EOP,
 		/** ============================= */
 
+		/** set 0, ???; "hi" as uint32 */
 		LIBDICE_OPCODE_SET, 0, *(const libdice_word_t*)(const void*)"hi\0\0",
+		/** puts 0 */
 		LIBDICE_OPCODE_PUTS, 0, 0,
-		LIBDICE_OPCODE_SET, 0, 42,
-		LIBDICE_OPCODE_DEF, 1, 1, 0, 1, 0,
-		LIBDICE_OPCODE_PUTI, 1, 1,
-		LIBDICE_OPCODE_UNDEF, 2, 1, 0,
-		LIBDICE_OPCODE_PUTI, 1, 2,
 		LIBDICE_OPCODE_EOP,
 	};
 	libdice_put_interface	INTERFACE;
@@ -116,7 +113,7 @@ int main(void) {
 			, LOOKUP, sizeof(LOOKUP) / sizeof(LOOKUP[0])
 			);
 
-	printf("\nFinal State: %u\n", CONTEXT.m_state);
+	printf("Final State: %u\n", CONTEXT.m_state);
 	printf("Programme counter: %u\n", CONTEXT.m_pc);
 
 	return (int)CONTEXT.m_state;

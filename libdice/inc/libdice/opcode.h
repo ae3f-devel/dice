@@ -6,10 +6,10 @@
 /**
  *
  * */
-enum LIBDICE_OPCODE_ {
+enum LIBDICE_OPCODE_
+{
 
-
-	/** 
+	/**
 	 * @brief do nothing.
 	 * @details nop
 	 * */
@@ -89,13 +89,13 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief negates an integer
-	 * @details ineg dst nref val 
+	 * @details ineg dst nref val
 	 * */
 	LIBDICE_OPCODE_INEG,
 
 	/**
 	 * @brief negates a floating point
-	 * @details fneg dst nref val 
+	 * @details fneg dst nref val
 	 * */
 	LIBDICE_OPCODE_FNEG,
 
@@ -169,7 +169,6 @@ enum LIBDICE_OPCODE_ {
 	 * */
 	LIBDICE_OPCODE_LOR,
 
-
 	/**
 	 * @brief logical not
 	 * @details lnot dst nref val
@@ -183,7 +182,7 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_TOBIT,
 
 	/**
-	 * @brief 
+	 * @brief
 	 * check if two values are equal.
 	 * result will be normalised to bool.
 	 * @details eq dst nref val nref2 val2
@@ -191,10 +190,10 @@ enum LIBDICE_OPCODE_ {
 	LIBDICE_OPCODE_EQ,
 
 	/**
-	 * @brief 
+	 * @brief
 	 * check if two values are not equal.
 	 * result will be normalised to bool.
-	 * @details eq dst nref val nref3 val2
+	 * @details eq dst nref val nref2 val2
 	 * */
 	LIBDICE_OPCODE_NEQ,
 	/**
@@ -218,68 +217,50 @@ enum LIBDICE_OPCODE_ {
 
 	/**
 	 * @brief	Integer Greater Than
-	 * @details	
+	 * @details
 	 * ```
-	 * igt dst nref val nref3 val2
+	 * igt dst nref val nref2 val2
 	 * ```
 	 *
-	 * would be val > val3 as int
+	 * would be val > val2 as int
 	 * */
 	LIBDICE_OPCODE_IGT,
 
 	/**
 	 * @brief	Floating point Greater Than
-	 * @details	
+	 * @details
 	 * ```
-	 * fgt dst nref val nref3 val2
+	 * fgt dst nref val nref2 val2
 	 * ```
 	 *
-	 * would be val > val3 as float
+	 * would be val > val2 as float
 	 * */
 	LIBDICE_OPCODE_FGT,
 
 	/**
 	 * @brief	Floating point Lesser Than
-	 * @details	
+	 * @details
 	 * ```
-	 * ilt dst nref val nref3 val2
+	 * ilt dst nref val nref2 val2
 	 * ```
 	 *
-	 * would be val < val3 as int
+	 * would be val < val2 as int
 	 * */
 	LIBDICE_OPCODE_ILT,
 
 	/**
 	 * @brief	Floating point Lesser Than
-	 * @details	
+	 * @details
 	 * ```
-	 * flt dst nref val nref3 val2
+	 * flt dst nref val nref2 val2
 	 * ```
 	 *
-	 * would be val < val3 as float
+	 * would be val < val2 as float
 	 * */
 	LIBDICE_OPCODE_FLT,
 
 	LIBDICE_OPCODE_SAVE,
 	LIBDICE_OPCODE_LOAD,
-
-	/**
-	 * @brief	define a lookup (dictionary) entry
-	 * @details
-	 * DEF dst nref key value
-	 * - dst: RAM index which will receive the entry id (entry number)
-	 * - key: nref (count + index) pointing to key (uses same deref format as other ops)
-	 * - value: immediate value to store with the key
-	 */
-	LIBDICE_OPCODE_DEF,
-
-	/**
-	 * @brief	undefine (remove) a lookup entry
-	 * @details
-	 * UNDEF dst nref key
-	 * - dst: RAM index which will receive result (1 if removed else 0)
-	 */
-	LIBDICE_OPCODE_UNDEF,
 
 	/**
 	 * @brief	puts string in terminal
@@ -311,11 +292,39 @@ enum LIBDICE_OPCODE_ {
 	 * */
 	LIBDICE_OPCODE_PUTF,
 
-	/** 
-	 * @brief end of programme
-	 * @details nop
+	/**
+	 * @details def nref key_ptr
 	 * */
-	LIBDICE_OPCODE_EOP = 0x7FFFFFFF
+	LIBDICE_OPCODE_DEF,
+
+	/**
+	 * @details undef nref key_ptr
+	 * */
+	LIBDICE_OPCODE_UNDEF,
+	
+	/**
+	 * @brief sets the random seed
+	 * @details SETRANDSEED nref val
+	 * */
+	LIBDICE_OPCODE_SETRANDSEED,
+
+	/**
+	 * @brief sets the random seed
+	 * @details IRAND dst
+	 */
+	LIBDICE_OPCODE_IRAND,
+
+	/**
+	 * @brief sets the float random seed
+	 * @details FRAND dst
+	 */
+	LIBDICE_OPCODE_FRAND,
+
+	/**
+	 * @brief end of programme
+	 * @details eop
+	 * */
+	LIBDICE_OPCODE_EOP = 0x7FFFFFFF,
 };
 
 #endif
