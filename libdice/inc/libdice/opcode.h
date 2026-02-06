@@ -204,6 +204,18 @@ enum LIBDICE_OPCODE_
 	LIBDICE_OPCODE_SET,
 
 	/**
+	 * @brief copy src_val to dst
+	 * @details mset nref dst_ptr nref src_val
+	 * */
+	LIBDICE_OPCODE_MSET,
+
+	/**
+	 * @brief copy *src_ptr to *dst_ptr
+	 * @details mov nref dst_ptr nref src_ptr
+	 * */
+	LIBDICE_OPCODE_MOV,
+
+	/**
 	 * @brief cast integer to float
 	 * @details itof dst nref val
 	 * */
@@ -302,6 +314,24 @@ enum LIBDICE_OPCODE_
 	 * */
 	LIBDICE_OPCODE_UNDEF,
 
+	/**
+	 * 
+	 *	 setrandseed nref val(u32)
+	 * */
+	LIBDICE_OPCODE_SETRANDSEED,
+
+	/**
+	 * 
+	 *	 irand dst
+	 * */
+	LIBDICE_OPCODE_IRAND,
+
+	/**
+	 *	 frand dst
+	 * */
+	LIBDICE_OPCODE_FRAND,
+
+	
 	/**
 	 * @brief end of programme
 	 * @details nop

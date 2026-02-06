@@ -5,7 +5,6 @@
 
 typedef u32_least libdice_word_t;
 
-/* not used */
 typedef union
 {
 	libdice_word_t m_word;
