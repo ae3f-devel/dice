@@ -582,18 +582,22 @@ DICEIMPL libdice_ctx libdice_run_one(
 				continue;
 			}
 
+			
+		}
+
+		if (i < c_ctx.m_lookup_used)
+		{
 			/* found same key */
 			c_ctx.m_pc += 3;
 			return c_ctx;
 		}
 
 		rdwr_lookup[c_ctx.m_lookup_used] = key_byte_len;
-		c_ctx.m_lookup_used++;
 
 		/* copy key */
 		for (i = 0; i < key_word_len; i++)
 		{
-			rdwr_lookup[c_ctx.m_lookup_used + i] = rdwr_ram[O0 + i];
+			rdwr_lookup[c_ctx.m_lookup_used + i + 1] = rdwr_ram[O0 + i];
 		}
 		c_ctx.m_lookup_used += LIBDICE_LOOKUP_SECTION_WORD_LEN;
 
