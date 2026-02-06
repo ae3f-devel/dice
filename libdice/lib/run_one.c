@@ -72,68 +72,64 @@ static ae2f_inline ae2f_ccpure libdice_word_t __strequal(
 static ae2f_inline ae2f_ccconst __result __one_const(
     libdice_ctx c_ctx,
     const libdice_word_t c_opcode,
-    const libdice_word_t c_oprand)
+    const libdice_word_t c_operand)
 {
+	union
+	{
+		float m_f32;
+		int_least32_t m_i32;
+		libdice_word_t m_u32;
+	} CVRT;
+
 	__result RET;
 
 	RET.m_ctx = c_ctx;
 	RET.m_ctx.m_pc += 4;
-	RET.m_r0 ^= RET.m_r0;
+	RET.m_r0 = 0;
 
 	switch (c_opcode)
 	{
 	case LIBDICE_OPCODE_BNOT:
-		RET.m_r0 = ~c_oprand;
+		RET.m_r0 = ~c_operand;
 		return RET;
 
 	case LIBDICE_OPCODE_LNOT:
-		RET.m_r0 = !c_oprand;
+		RET.m_r0 = !c_operand;
 		return RET;
 
 	case LIBDICE_OPCODE_TOBIT:
-		RET.m_r0 = !!c_oprand;
+		RET.m_r0 = !!c_operand;
 		return RET;
 
 	case LIBDICE_OPCODE_INEG:
-		RET.m_r0 = -c_oprand;
+		RET.m_r0 = -c_operand;
 		return RET;
 
 	case LIBDICE_OPCODE_JMP:
-		RET.m_ctx.m_pc = c_oprand;
+		RET.m_ctx.m_pc = c_operand;
 		return RET;
 
 	case LIBDICE_OPCODE_JMPA:
-		RET.m_ctx.m_pc += c_oprand - 4;
+		RET.m_ctx.m_pc += c_operand - 4;
 		return RET;
 
 	case LIBDICE_OPCODE_JMPN:
-		RET.m_ctx.m_pc -= c_oprand + 4;
+		RET.m_ctx.m_pc -= c_operand + 4;
 		return RET;
 
-		{
-			union
-			{
-				float m_f32;
-				int_least32_t m_i32;
-				libdice_word_t m_u32;
-			} CVRT;
-
-		case LIBDICE_OPCODE_ITOF:
-			CVRT.m_f32 = (float)(int_least32_t)c_oprand;
-			RET.m_r0 = CVRT.m_u32;
-			return RET;
-
-		case LIBDICE_OPCODE_FTOI:
-			CVRT.m_u32 = c_oprand;
-			RET.m_r0 = (libdice_word_t)(int_least32_t)CVRT.m_f32;
-			return RET;
-
-		case LIBDICE_OPCODE_FNEG:
-			CVRT.m_u32 = c_oprand;
-			CVRT.m_f32 = -CVRT.m_f32;
-			RET.m_r0 = CVRT.m_u32;
-			return RET;
-		}
+	case LIBDICE_OPCODE_ITOF:
+		CVRT.m_f32 = (float)(int_least32_t)c_operand;
+		RET.m_r0 = CVRT.m_u32;
+		return RET;
+	case LIBDICE_OPCODE_FTOI:
+		CVRT.m_u32 = c_operand;
+		RET.m_r0 = (libdice_word_t)(int_least32_t)CVRT.m_f32;
+		return RET;
+	case LIBDICE_OPCODE_FNEG:
+		CVRT.m_u32 = c_operand;
+		CVRT.m_f32 = -CVRT.m_f32;
+		RET.m_r0 = CVRT.m_u32;
+		return RET;
 
 	default:
 		assert(0);
@@ -141,10 +137,11 @@ static ae2f_inline ae2f_ccconst __result __one_const(
 	}
 }
 
+/* TODO : Can't understand variable naming. c_operand, c_op1*/
 static ae2f_inline ae2f_ccconst __result __two_const(
     libdice_ctx c_ctx,
     const libdice_word_t c_opcode,
-    const libdice_word_t c_oprand,
+    const libdice_word_t c_operand,
     const libdice_word_t c_op1)
 {
 
@@ -153,7 +150,7 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 	RET.m_ctx = c_ctx;
 	/** opcode dst nref val nref val */
 	RET.m_ctx.m_pc += 6;
-	RET.m_r0 ^= RET.m_r0;
+	RET.m_r0 = 0;
 
 	union
 	{
@@ -170,56 +167,56 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 	case LIBDICE_OPCODE_FDIV:
 	case LIBDICE_OPCODE_FLT:
 	case LIBDICE_OPCODE_FGT:
-		VAL0.m_u32 = c_oprand;
+		VAL0.m_u32 = c_operand;
 		VAL1.m_u32 = c_op1;
 		ae2f_fallthrough;
 	default:
 		break;
 	}
 
-	VAL0.m_u32 = c_oprand;
+	VAL0.m_u32 = c_operand;
 	VAL1.m_u32 = c_op1;
 
 	switch (c_opcode)
 	{
 	case LIBDICE_OPCODE_EQ:
-		RET.m_r0 = c_oprand == c_op1;
+		RET.m_r0 = c_operand == c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_NEQ:
-		RET.m_r0 = c_oprand != c_op1;
+		RET.m_r0 = c_operand != c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_BAND:
-		RET.m_r0 = c_oprand & c_op1;
+		RET.m_r0 = c_operand & c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_BOR:
-		RET.m_r0 = c_oprand | c_op1;
+		RET.m_r0 = c_operand | c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_BXOR:
-		RET.m_r0 = c_oprand ^ c_op1;
+		RET.m_r0 = c_operand ^ c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_BLSHIFT:
-		RET.m_r0 = c_oprand << c_op1;
+		RET.m_r0 = c_operand << c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_BRSHIFT:
-		RET.m_r0 = (uint_least32_t)((int_least32_t)c_oprand >> c_op1);
+		RET.m_r0 = (uint_least32_t)((int_least32_t)c_operand >> c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_LRSHIFT:
-		RET.m_r0 = (c_oprand >> c_op1);
+		RET.m_r0 = (c_operand >> c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_LAND:
-		RET.m_r0 = c_oprand && c_op1;
+		RET.m_r0 = c_operand && c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_LOR:
-		RET.m_r0 = c_oprand || c_op1;
+		RET.m_r0 = c_operand || c_op1;
 		return RET;
 
 #define __operate_signed(L_oper, a, b) \
@@ -228,35 +225,35 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 #define __operate_usigned(L_oper, a, b) \
 	((libdice_word_t)((a)L_oper(b)))
 	case LIBDICE_OPCODE_IADD:
-		RET.m_r0 = c_oprand + c_op1;
+		RET.m_r0 = c_operand + c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_ISUB:
-		RET.m_r0 = c_oprand - c_op1;
+		RET.m_r0 = c_operand - c_op1;
 		return RET;
 
 	case LIBDICE_OPCODE_IMUL:
-		RET.m_r0 = __operate_signed(*, c_oprand, c_op1);
+		RET.m_r0 = __operate_signed(*, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_IDIV:
-		RET.m_r0 = __operate_signed(/, c_oprand, c_op1);
+		RET.m_r0 = __operate_signed(/, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_IREM:
-		RET.m_r0 = __operate_signed(%, c_oprand, c_op1);
+		RET.m_r0 = __operate_signed(%, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_UMUL:
-		RET.m_r0 = __operate_usigned(*, c_oprand, c_op1);
+		RET.m_r0 = __operate_usigned(*, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_UDIV:
-		RET.m_r0 = __operate_usigned(/, c_oprand, c_op1);
+		RET.m_r0 = __operate_usigned(/, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_UREM:
-		RET.m_r0 = __operate_usigned(%, c_oprand, c_op1);
+		RET.m_r0 = __operate_usigned(%, c_operand, c_op1);
 		return RET;
 
 	case LIBDICE_OPCODE_FADD:
@@ -280,21 +277,21 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 		return RET;
 
 	case LIBDICE_OPCODE_JMPZ:
-		RET.m_ctx.m_pc = c_oprand
+		RET.m_ctx.m_pc = c_operand
 				     ? RET.m_ctx.m_pc
 				     : c_op1;
 
 		return RET;
 
 	case LIBDICE_OPCODE_JMPZA:
-		RET.m_ctx.m_pc += c_oprand
+		RET.m_ctx.m_pc += c_operand
 				      ? RET.m_ctx.m_pc - 6
 				      : 0;
 
 		return RET;
 
 	case LIBDICE_OPCODE_JMPZN:
-		RET.m_ctx.m_pc -= c_oprand
+		RET.m_ctx.m_pc -= c_operand
 				      ? RET.m_ctx.m_pc + 6
 				      : 0;
 		return RET;
@@ -308,10 +305,10 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 		return RET;
 
 	case LIBDICE_OPCODE_IGT:
-		RET.m_r0 = c_oprand > c_op1;
+		RET.m_r0 = c_operand > c_op1;
 		return RET;
 	case LIBDICE_OPCODE_ILT:
-		RET.m_r0 = c_oprand < c_op1;
+		RET.m_r0 = c_operand < c_op1;
 		return RET;
 	default:
 		assert(0);
@@ -340,9 +337,7 @@ DICEIMPL libdice_ctx libdice_run_one(
 	assert(rd_interface_put->m_pfn_putf);
 	assert(rd_interface_put->m_pfn_putu);
 	assert(rd_interface_put->m_pfn_puti);
-	assert(c_num_lookup >= LIBDICE_LOOKUP_SECTION_WORD_LEN);
-
-	(void)rdwr_lookup;
+	assert(c_num_lookup >= LIBDICE_LOOKUP_SECTION_WORD_LEN); /* TODO : assert가 아닌, if문 사용이 맞는듯*/
 
 	ae2f_unexpected_but_if(c_ctx.m_state != LIBDICE_CTX_GOOD) { return c_ctx; }
 	ae2f_expected_but_else(c_ctx.m_pc < c_num_programme)
@@ -390,22 +385,18 @@ DICEIMPL libdice_ctx libdice_run_one(
 			c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
 			return c_ctx;
 		}
-		ae2f_expected_but_else(c_ctx.m_pc + 1 < c_num_programme)
-		{
-			c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
-			return c_ctx;
-		}
+		
 		ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
 		{
 			c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
 			return c_ctx;
 		}
 
-		rd_programme[c_ctx.m_pc + 1][rdwr_ram] = c_ctx.m_pc[rd_programme + 2];
+		rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = rd_programme[c_ctx.m_pc + 2];
 		c_ctx.m_pc += 3;
 		return c_ctx;
 	case LIBDICE_OPCODE_NOP:
-		++c_ctx.m_pc;
+		c_ctx.m_pc++;
 		return c_ctx;
 	case LIBDICE_OPCODE_EOP:
 		c_ctx.m_state = LIBDICE_CTX_EOP;
@@ -433,7 +424,7 @@ DICEIMPL libdice_ctx libdice_run_one(
 	case LIBDICE_OPCODE_JMP:
 		__deref(O0, 1);
 		RESULT = __one_const(
-		    c_ctx, rd_programme[c_ctx.m_pc], O0);
+		    c_ctx, rd_programme[c_ctx.m_pc], O0); /* Need boundary check*/
 
 		return RESULT.m_ctx;
 

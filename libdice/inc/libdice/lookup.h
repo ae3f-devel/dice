@@ -5,10 +5,10 @@
 
 /**
  * @brief format of lookup
- * | key_length | value_length | key | value |
- * Both key and value' length are variable.
+ * | key_length | key | value |
+ * key_length are variable.
  * key is terminated by nul-character
- * key must be aligned 4-byte
+ * key must be aligned 4-byte (Add padding if key_length is not aligned)
  */
 
 #define LIBDICE_LOOKUP_SECTION_BYTE_LEN 16
