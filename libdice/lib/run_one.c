@@ -140,7 +140,6 @@ static ae2f_inline ae2f_ccconst __result __one_const(
 	}
 }
 
-/* TODO : Can't understand variable naming. c_operand, c_op1*/
 static ae2f_inline ae2f_ccconst __result __two_const(
 		libdice_ctx c_ctx,
 		const libdice_word_t c_opcode,
@@ -443,28 +442,36 @@ DICEIMPL libdice_ctx libdice_run_one(
 		case LIBDICE_OPCODE_FNEG:
 		case LIBDICE_OPCODE_BNOT:
 		case LIBDICE_OPCODE_LNOT:
+		case LIBDICE_OPCODE_TOBIT:
 		case LIBDICE_OPCODE_ITOF:
 		case LIBDICE_OPCODE_FTOI:
-		__deref(O0, 2);
-		RESULT = __one_const(
-				c_ctx, rd_programme[c_ctx.m_pc], O0);
-
-		ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
 		{
-			c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
-			return c_ctx;
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
 		}
 
-		rdwr_ram[c_ctx.m_pc[rd_programme + 1]] = RESULT.m_r0;
-		return RESULT.m_ctx;
-
 		case LIBDICE_OPCODE_JMP:
-		__deref(O0, 1);
+		case LIBDICE_OPCODE_JMPA:
+		case LIBDICE_OPCODE_JMPN:
+		{
+			__deref(O0, 1);
 
-		RESULT = __one_const(
-				c_ctx, rd_programme[c_ctx.m_pc], O0); 
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
 
-		return RESULT.m_ctx;
+			return RESULT.m_ctx;
+		}
 
 		case LIBDICE_OPCODE_FADD:
 		case LIBDICE_OPCODE_FDIV:
@@ -492,21 +499,22 @@ DICEIMPL libdice_ctx libdice_run_one(
 		case LIBDICE_OPCODE_FGT:
 		case LIBDICE_OPCODE_ILT:
 		case LIBDICE_OPCODE_FLT:
-		__deref(O1, 4);
-		__deref(O0, 2);
-
-		RESULT = __two_const(
-				c_ctx, rd_programme[c_ctx.m_pc], O0, O1);
-
-		ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
 		{
-			c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
-			return c_ctx;
+			__deref(O1, 4);
+			__deref(O0, 2);
+
+			RESULT = __two_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0, O1);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
 		}
-
-		rdwr_ram[c_ctx.m_pc[rd_programme + 1]] = RESULT.m_r0;
-		return RESULT.m_ctx;
-
 		case LIBDICE_OPCODE_JMPZ:
 		case LIBDICE_OPCODE_JMPZA:
 		case LIBDICE_OPCODE_JMPZN:
@@ -706,7 +714,6 @@ DICEIMPL libdice_ctx libdice_run_one(
 		}
 		case LIBDICE_OPCODE_IRAND:
 		{
-
 			ae2f_expected_but_else(c_ctx.m_pc + 1 < c_num_programme)
 			{
 				c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
