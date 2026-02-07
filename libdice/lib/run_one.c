@@ -439,11 +439,101 @@ DICEIMPL libdice_ctx libdice_run_one(
 		return c_ctx;
 
 		case LIBDICE_OPCODE_INEG:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_FNEG:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_BNOT:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_LNOT:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_TOBIT:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_ITOF:
+		{
+			__deref(O0, 2);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = RESULT.m_r0;
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_FTOI:
 		{
 			__deref(O0, 2);
@@ -462,7 +552,23 @@ DICEIMPL libdice_ctx libdice_run_one(
 		}
 
 		case LIBDICE_OPCODE_JMP:
+		{
+			__deref(O0, 1);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_JMPA:
+		{
+			__deref(O0, 1);
+
+			RESULT = __one_const(
+					c_ctx, rd_programme[c_ctx.m_pc], O0);
+
+			return RESULT.m_ctx;
+		}
 		case LIBDICE_OPCODE_JMPN:
 		{
 			__deref(O0, 1);
