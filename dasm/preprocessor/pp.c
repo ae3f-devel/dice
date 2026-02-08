@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <stdbool.h>
+#include <ae2f/c90/StdBool.h>
 
 #define PP_CHAR_START '\''
 #define PP_CHAR_END '\''
