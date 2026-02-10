@@ -249,7 +249,7 @@ static libdice_word_t libdasm_parse_operand(struct libdasm_operand *rdwr_operand
 
 /**
  * @return 1==success parsing, 0==failed parsing, LIBDASM_ERR_RET==error
- * * */
+ * * */ 
 static libdice_word_t libdasm_parse_line(struct libdasm_parsed_line *rdwr_parsed_line, const struct libdasm_token_line *rd_token_line, 
 					const struct libdasm_label_table *rd_label_table)
 {
@@ -296,14 +296,15 @@ static libdice_word_t libdasm_parse_line(struct libdasm_parsed_line *rdwr_parsed
 		libdice_word_t tmp = 0;
 		rd_token = &(rd_token_line->m_tokens[token_line_idx]);
 		/* boundary check */
-		if (tmp_operand_cnt+1 > LIBDICE_OPERAND_MAX_CNT) {
-			return LIBDASM_ERR_RET;
-		}
+		
 		tmp = libdasm_parse_operand(&(rdwr_parsed_line->m_operands[tmp_operand_cnt]), rd_token, rd_label_table);
 		if (tmp == LIBDASM_ERR_RET) {
 			return LIBDASM_ERR_RET;
 		}
 		if (tmp) {
+			if (tmp_operand_cnt+1 > LIBDICE_OPERAND_MAX_CNT) {
+				return LIBDASM_ERR_RET;
+			}
 			tmp_operand_cnt++;
 		}
 	}

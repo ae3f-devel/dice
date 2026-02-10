@@ -81,43 +81,43 @@ static inline bool libdasm_set_token_type(struct libdasm_token_line rdwr_tokens[
 
 static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_tokens[], const char rd_src[], const libdice_word_t c_src_len)
 {
-	libdice_word_t src_cnt = 0;
+	libdice_word_t read_cnt = 0;
 	enum e_tokenizer_state state = TOKENIZER_STATE_IDLE;
 	libdice_word_t char_cnt = 0;
 
 	libdasm_init_token_line(rdwr_tokens);
 	
-	for (src_cnt=0; src_cnt < c_src_len;) {
-		const char c = rd_src[src_cnt];
+	for (read_cnt=0; read_cnt < c_src_len;) {
+		const char c = rd_src[read_cnt];
 		switch (state)
 		{
 			case TOKENIZER_STATE_IDLE:
 				if (c==' ') {
-					src_cnt++;
+					read_cnt++;
 				} else if (c=='\n') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_EOL);
-					src_cnt++;
-					return src_cnt;
+					read_cnt++;
+					return read_cnt;
 				} else if (c=='*') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_OPERATOR);
 					state = TOKENIZER_STATE_OPERATOR;
-					src_cnt++;
+					read_cnt++;
 				} else if (is_alphabet(c) || c=='_') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_IDENT);
 					state = TOKENIZER_STATE_IDENT;
-					src_cnt++;
+					read_cnt++;
 				} else if (c=='\"') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_STRING);
 					state = TOKENIZER_STATE_STRING;
-					src_cnt++;
+					read_cnt++;
 				} else if (c=='\'') {
 					/* TODO : Don't copy single quote */
 					libdasm_create_new_token(rdwr_tokens);
@@ -125,19 +125,19 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_CHAR);
 					state = TOKENIZER_STATE_CHAR;
 					char_cnt = 0;
-					src_cnt++;
+					read_cnt++;
 				} else if (c=='\0') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_EOP);
 					/* The count was intentionally not incremented. */
-					return src_cnt;
+					return read_cnt;
 				} else if (is_number(c) || c=='-') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_NUMBER);
 					state = TOKENIZER_STATE_NUMBER;
-					src_cnt++;
+					read_cnt++;
 				} else {
 					assert(0);
 				}
@@ -145,11 +145,11 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 			case TOKENIZER_STATE_IDENT:
 				if (is_alphabet(c) || is_number(c) || c=='_') {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 				} else if (c==':') {
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_LABEL);
 					state = TOKENIZER_STATE_IDLE;
-					src_cnt++;
+					read_cnt++;
 				} else {
 					state = TOKENIZER_STATE_IDLE;
 				}
@@ -157,7 +157,7 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 			case TOKENIZER_STATE_NUMBER:
 				if (is_number(c)) {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 				} else {
 					state = TOKENIZER_STATE_IDLE;
 				}
@@ -167,22 +167,22 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 				/* TODO : escape sequence handling  */
 				if (c=='\"') {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 					state = TOKENIZER_STATE_IDLE;
 				} else {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 				}
 				break;
 			case TOKENIZER_STATE_CHAR:
 				/* TODO : Don't copy single quote */
 				if (char_cnt==1 && c=='\'') {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 					state = TOKENIZER_STATE_IDLE;
 				} else if (char_cnt == 0 && (unsigned char)c < 0x80) {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 					char_cnt++;
 				} else {
 					return LIBDASM_ERR_RET;		/* not 1 character or Non ascii */
@@ -191,7 +191,7 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 			case TOKENIZER_STATE_OPERATOR:
 				if (c=='*') {
 					libdasm_insert_token_char(rdwr_tokens, c);
-					src_cnt++;
+					read_cnt++;
 				} else {
 					state = TOKENIZER_STATE_IDLE;
 				}
@@ -203,7 +203,7 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 		
 		
 	}
-	return src_cnt;
+	return read_cnt;
 }
 
 
@@ -227,20 +227,26 @@ libdice_word_t libdasm_get_token_line_word_len(const struct libdasm_token_line *
 
 libdice_word_t libdasm_tokenize_programme(struct libdasm_token_line rdwr_token_lines[], const libdice_word_t c_token_lines_len, const char rd_src[], const libdice_word_t c_src_len)
 {
-	libdice_word_t src_cnt = 0;
+	libdice_word_t read_cnt = 0;
 	libdice_word_t token_line_cnt = 0;
+	libdice_word_t read_src_len;
+	read_src_len = (libdice_word_t)strlen(rd_src);
 
-	while (src_cnt < c_src_len) {
+	while (read_cnt < c_src_len) {
 		libdice_word_t tmp_read_cnt = 0;
 		if (token_line_cnt + 1 > c_token_lines_len) {
 			return LIBDASM_ERR_RET;
 		}
-		tmp_read_cnt = libdasm_tokenize_line(&rdwr_token_lines[token_line_cnt], rd_src+src_cnt, c_src_len-src_cnt);
+		tmp_read_cnt = libdasm_tokenize_line(&rdwr_token_lines[token_line_cnt], rd_src+read_cnt, c_src_len-read_cnt);
 		if (tmp_read_cnt == LIBDASM_ERR_RET) {
 			return LIBDASM_ERR_RET;
 		}
-		src_cnt += tmp_read_cnt;
+		read_cnt += tmp_read_cnt;
 		token_line_cnt++;
+
+		if (read_cnt >= read_src_len) {
+			break;
+		}
 	} 
 
 	return token_line_cnt;

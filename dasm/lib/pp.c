@@ -122,6 +122,7 @@ static libdice_word_t libdasm_remove_comment_from_line(char rdwr_dst[], const li
 		*rdwr_state = libdasm_update_pp_state(*rdwr_state, c);
 		
 		if (c=='\n') {
+			++read_cnt;
 			break;
 		}
 
@@ -187,6 +188,7 @@ static libdice_word_t libdasm_normalize_line(char rdwr_dst[], const libdice_word
 
 		if (c == '\n') {
 			/* break after copy */
+			read_cnt++;
 			break;
 		}
 	}
@@ -204,9 +206,12 @@ static libdice_word_t libdasm_normalize_line(char rdwr_dst[], const libdice_word
 
 static libdice_word_t libdasm_remove_comments(char rdwr_dst[], const libdice_word_t c_dst_len, const char rd_src[], const libdice_word_t c_src_len)
 {
+	libdice_word_t real_src_len;
 	libdice_word_t read_cnt = 0;
 	libdice_word_t write_cnt = 0;
 	enum LIBDASM_PP_STATE_ state = LIBDASM_PP_STATE_NORMAL;
+
+	real_src_len = (libdice_word_t)strlen(rd_src);
 
 	while (read_cnt < c_src_len) {
 		libdice_word_t tmp_read_cnt = 0;
@@ -223,6 +228,10 @@ static libdice_word_t libdasm_remove_comments(char rdwr_dst[], const libdice_wor
 		assert(tmp_read_cnt > 0);
 		write_cnt += tmp_write_cnt;
 		read_cnt += tmp_read_cnt;
+
+		if (read_cnt >= real_src_len) {
+			break;
+		}
 	}
 
 	if (write_cnt+1 > c_dst_len) {
@@ -230,6 +239,7 @@ static libdice_word_t libdasm_remove_comments(char rdwr_dst[], const libdice_wor
 	}
 	
 	rdwr_dst[write_cnt] = '\0';	/* The count was intentionally not incremented.  */
+	write_cnt++;
 
 	return write_cnt;
 }
@@ -238,6 +248,8 @@ static libdice_word_t libdasm_normalize_lines(char rdwr_dst[], const libdice_wor
 {
 	libdice_word_t read_cnt = 0;
 	libdice_word_t write_cnt = 0;
+	libdice_word_t real_src_len;
+	real_src_len = (libdice_word_t)strlen(rd_src);
 
 	while (read_cnt < c_src_len) {
 		libdice_word_t tmp_read_cnt = 0;
@@ -254,6 +266,10 @@ static libdice_word_t libdasm_normalize_lines(char rdwr_dst[], const libdice_wor
 		assert(tmp_read_cnt > 0);
 		write_cnt += tmp_write_cnt;
 		read_cnt += tmp_read_cnt;
+	
+		if (read_cnt >= real_src_len) {
+			break;
+		}
 	}
 
 	if (write_cnt+1 > c_dst_len) {
@@ -261,6 +277,7 @@ static libdice_word_t libdasm_normalize_lines(char rdwr_dst[], const libdice_wor
 	}
 	
 	rdwr_dst[write_cnt] = '\0';	/* The count was intentionally not incremented.  */
+	write_cnt++;
 
 	return write_cnt;
 }
