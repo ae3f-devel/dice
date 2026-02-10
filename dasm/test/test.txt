@@ -1,0 +1,11 @@
+"
+
+
+
+	buf: nop
+	iadd buf 5 6	
+	puti *buf
+
+	eop	
+
+"

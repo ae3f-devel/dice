@@ -132,7 +132,7 @@ static libdice_word_t libdasm_tokenize_line(struct libdasm_token_line rdwr_token
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_EOP);
 					/* The count was intentionally not incremented. */
 					return src_cnt;
-				} else if (is_number(c)) {
+				} else if (is_number(c) || c=='-') {
 					libdasm_create_new_token(rdwr_tokens);
 					libdasm_insert_token_char(rdwr_tokens, c);
 					libdasm_set_token_type(rdwr_tokens, LIBDASM_TOKEN_TYPE_NUMBER);

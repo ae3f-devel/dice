@@ -18,10 +18,7 @@ static libdice_word_t libdasm_assemble_line(libdice_word_t rdwr_dst[], const lib
 
 	for (tmp_operand_cnt=0; tmp_operand_cnt<rd_parsed_line->m_operand_cnt; ++tmp_operand_cnt) {
 		number = strtol(rd_parsed_line->m_operands[tmp_operand_cnt].m_text, &end, 10);
-		if (number<0) {
-			/* TODO : compare with libdice_word_t's max value */
-			return LIBDASM_ERR_RET;
-		}
+		
 		if (end == rd_parsed_line->m_operands[tmp_operand_cnt].m_text) {
 			return LIBDASM_ERR_RET;	/* not number */
 		} else if (*end != '\0') {

@@ -333,7 +333,7 @@ enum LIBDICE_OPCODE_
 
 	/**
 	 * @brief end of programme
-	 * @details nop
+	 * @details eop
 	 * */
 	LIBDICE_OPCODE_EOP = 0x7FFFFFFF
 };
