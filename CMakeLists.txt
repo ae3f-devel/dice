@@ -22,4 +22,5 @@ endmacro()
 
 ae3f_dice_addsubdir(libdice)
 ae3f_dice_addsubdir(dasm)
+ae3f_dice_addsubdir(rolladie)
 dice_addsubdir(dice-server)

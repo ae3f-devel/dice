@@ -4,3 +4,6 @@ include(CMakeFindDependencyMacro)
 
 include(CMakePackageConfigHelpers)
 include("${CMAKE_CURRENT_LIST_DIR}/libdiceTargets.cmake")
+
+find_dependency(Core REQUIRED)
+link_libraries(ae2f::Core)
