@@ -61,7 +61,10 @@ int main(int argc, const char** argv) {
 	SOCKADDR_SVR.m_in.sin_port		= htons(PORT);
 	SOCKADDR_SVR.m_in.sin_family		= AF_INET;
 
-	if(bind(SOCK_SVR, &SOCKADDR_SVR.m_addr, sizeof(SOCKADDR_SVR.m_in)) < 0)
+	if(AE2FSYS_SOCK_INVL == bind(
+				SOCK_SVR
+				, &SOCKADDR_SVR.m_addr
+				, sizeof(SOCKADDR_SVR.m_in)))
 	{
 		assert(0 && "[main]\tbind failed.");
 		closesocket(AF_INET);

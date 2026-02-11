@@ -36,9 +36,9 @@ ae2f_CoreLibFetchX(ae2f Sys main)
 ae2f_Macro_init(1 30 30)
 ae2f_Macro_Lib_V2(
 	ae3f rolladie STATIC
-	${PROJECT_SOURCE_DIR}/lib "*.c"
-	${PROJECT_SOURCE_DIR}/src "*.def.c"
-	${PROJECT_SOURCE_DIR}/inc ".auto.h"
+	${PROJECT_SOURCE_DIR}/lib/ "*.c"
+	${PROJECT_SOURCE_DIR}/src/ "*.def.c"
+	${PROJECT_SOURCE_DIR}/inc/ ".auto.h"
 	${ae2f_ProjRoot}/cfg/rolladie.cmake.in
 	inc ON
 	)
