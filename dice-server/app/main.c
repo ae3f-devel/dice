@@ -34,7 +34,7 @@ int main(int argc, const char** argv) {
 	/** socket bind & listen */
 	/************************************************************/
 	ae2fsys_declmkinet(DECLINET);
-	ae2fsys_initinet_imp(RET, MAKE_WORD(2, 2), DECLINET);
+	ae2fsys_initinet_imp(RET, MAKEWORD(2, 2), DECLINET);
 
 	assert(!RET && "[main]\tae2fsys_initinet_imp failed.");
 
@@ -81,7 +81,7 @@ int main(int argc, const char** argv) {
 	/************************************************************/
 	/** cleanup */
 	/************************************************************/
-	close(SOCK_SVR);
+	closesocket(SOCK_SVR);
 	ae2fsys_stopinet_imp(RET);
 	assert(!RET && "[main]\tae2fsys_stopinet_imp failed.");
 	(void)RET;
