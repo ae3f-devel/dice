@@ -38,7 +38,7 @@ int main(int argc, const char** argv) {
 
 	assert(!RET && "[main]\tae2fsys_initinet_imp failed.");
 
-	if((SOCK_SVR = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	if((SOCK_SVR = socket(AF_INET, SOCK_STREAM, 0)) == AE2FSYS_SOCK_INVL)
 	{
 		assert(0 && "[main]\tsocket failed.");
 		return -1;
@@ -61,10 +61,10 @@ int main(int argc, const char** argv) {
 	SOCKADDR_SVR.m_in.sin_port		= htons(PORT);
 	SOCKADDR_SVR.m_in.sin_family		= AF_INET;
 
-	if(AE2FSYS_SOCK_INVL == bind(
+	if(bind(
 				SOCK_SVR
 				, &SOCKADDR_SVR.m_addr
-				, sizeof(SOCKADDR_SVR.m_in)))
+				, sizeof(SOCKADDR_SVR.m_in)) < 0)
 	{
 		assert(0 && "[main]\tbind failed.");
 		closesocket(AF_INET);
