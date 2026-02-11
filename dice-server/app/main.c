@@ -38,7 +38,8 @@ int main(int argc, const char** argv) {
 
 	assert(!RET && "[main]\tae2fsys_initinet_imp failed.");
 
-	if((SOCK_SVR = socket(AF_INET, SOCK_STREAM, 0)) == AE2FSYS_SOCK_INVL)
+	SOCK_SVR = socket(AF_INET, SOCK_STREAM, 0);
+	if(SOCK_SVR == AE2FSYS_SOCK_INVL)
 	{
 		assert(0 && "[main]\tsocket failed.");
 		return -1;
