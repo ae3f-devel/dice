@@ -370,6 +370,7 @@ DICEIMPL libdice_ctx libdice_run_one(
 
 		default:
 		break;
+#undef	__deref
 #define __deref(O0, c_pad)                                             \
 		ae2f_expected_but_else(c_ctx.m_pc + (c_pad) < c_num_programme) \
 		{                                                              \
