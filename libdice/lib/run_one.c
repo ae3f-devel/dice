@@ -753,7 +753,6 @@ DICEIMPL libdice_ctx libdice_run_one(
 			x ^= x << 5;
 
 			rdwr_ram[O0] = x;
-			rdwr_lookup[c_ctx.m_lookup_used + 2] = rdwr_ram[O0];
 
 			c_ctx.m_pc += 3;
 			return c_ctx;
