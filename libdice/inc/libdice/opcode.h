@@ -314,21 +314,10 @@ enum LIBDICE_OPCODE_
 	LIBDICE_OPCODE_UNDEF,
 
 	/**
-	 * 
-	 *	 setrandseed nref val(u32)
+	 * @brief	using `ptrdst` as seed, make new random word and store back in `ptrdst`
+	 * @details	rand nref ptrdst(u32*)
 	 * */
-	LIBDICE_OPCODE_SETRANDSEED,
-
-	/**
-	 * 
-	 *	 irand dst
-	 * */
-	LIBDICE_OPCODE_IRAND,
-
-	/**
-	 *	 frand dst
-	 * */
-	LIBDICE_OPCODE_FRAND,
+	LIBDICE_OPCODE_RAND,
 
 	/**
 	 * 	@brief	get time as u32

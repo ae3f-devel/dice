@@ -735,58 +735,10 @@ DICEIMPL libdice_ctx libdice_run_one(
 			c89atomic_fetch_and_32(rdwr_a32lck, 0);
 			return c_ctx;
 		}
-		case LIBDICE_OPCODE_SETRANDSEED:
+
+		case LIBDICE_OPCODE_RAND:
 		{
-			__deref(O0, 1);
-
-			srand(O0);
-
-			c_ctx.m_pc += 3;
-			return c_ctx;
-		}
-		case LIBDICE_OPCODE_IRAND:
-		{
-
-			ae2f_expected_but_else(c_ctx.m_pc + 1 < c_num_programme)
-			{
-				c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
-				return c_ctx;
-			}
-
-			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
-			{
-				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
-				return c_ctx;
-			}
-
-			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = (libdice_word_t)rand();
-
-			c_ctx.m_pc += 2;
-			return c_ctx;
-		}
-		case LIBDICE_OPCODE_FRAND:
-		{
-			libdice_type_literal tmp;
-
-			ae2f_expected_but_else(c_ctx.m_pc + 1 < c_num_programme)
-			{
-				c_ctx.m_state = LIBDICE_CTX_PC_AFTER_PROGRAMME;
-				return c_ctx;
-			}
-
-			ae2f_expected_but_else(rd_programme[c_ctx.m_pc + 1] < c_num_ram)
-			{
-				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
-				return c_ctx;
-			}
-
-			/** 0. ~ 1. */
-			tmp.m_f32 = (float)rand() /  (float)RAND_MAX;
-
-			rdwr_ram[rd_programme[c_ctx.m_pc + 1]] = tmp.m_u32;
-
-			c_ctx.m_pc += 2;
-			return c_ctx;
+			char IMPLEMENT_THIS[-1];
 		}
 	}
 
