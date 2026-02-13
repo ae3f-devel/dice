@@ -1,8 +1,8 @@
-#include "tokenizer.h"
+#include "./tokenizer.h"
 #include <string.h>
-#include <stdlib.h>
 #include <ae2f/c90/StdBool.h>
 #include <assert.h>
+
 
 #include <ctype.h>
 enum e_tokenizer_state {
@@ -10,51 +10,51 @@ enum e_tokenizer_state {
 	TOKENIZER_STATE_IDENT,
 	TOKENIZER_STATE_NUMBER,
 	TOKENIZER_STATE_STRING,
-	TOKENIZER_STATE_CHAR,
+	TOKENIZER_STATE_ASCII,
 	TOKENIZER_STATE_OPERATOR
 };
 
-#define	is_alphabet	isalpha
-#define	is_number	isdigit
 
-static void dasm_init_token_line(struct dasm_token_line rdwr_tokens[])
+
+
+static void dasm_init_tok_line(struct dasm_tok_line rdwr_toks[])
 {
-	rdwr_tokens->m_token_cnt = 0;
-	memset(rdwr_tokens->m_tokens
-			, 0, sizeof(struct dasm_token) * DASM_TOKEN_MAX_CNT_PER_LINE
+	rdwr_toks->m_tok_cnt = 0;
+	memset(rdwr_toks->m_toks
+			, 0, sizeof(struct dasm_tok) * DASM_TOK_MAX_CNT_PER_LINE
 			);
 }
 
-static bool dasm_create_new_token(struct dasm_token_line rdwr_tokens[])
+static bool dasm_create_new_tok(struct dasm_tok_line rdwr_toks[])
 {
-	if (rdwr_tokens->m_token_cnt == DASM_TOKEN_MAX_CNT_PER_LINE) {
+	if (rdwr_toks->m_tok_cnt == DASM_TOK_MAX_CNT_PER_LINE) {
 		return false;
 	}
 
-	memset(rdwr_tokens->m_tokens[rdwr_tokens->m_token_cnt].m_text, 0, DASM_TOKEN_MAX_LEN);
-	rdwr_tokens->m_token_cnt++;
+	memset(rdwr_toks->m_toks[rdwr_toks->m_tok_cnt].m_text, 0, DASM_TOK_MAX_LEN);
+	rdwr_toks->m_tok_cnt++;
 
 	return true;
 }
 
-/* Append c_c behind last token's last character. Doesn't create new token */
-static inline bool dasm_insert_token_char(struct dasm_token_line rdwr_tokens[], const char c_c)
+/* Append c_c behind last tok's last character. Doesn't create new tok */
+static inline bool dasm_insert_tok_char(struct dasm_tok_line rdwr_toks[], const char c_c)
 {
 	libdice_word_t i = 0;
-	char *token = rdwr_tokens->m_tokens[rdwr_tokens->m_token_cnt-1].m_text;	/* last token */
+	char *tok = rdwr_toks->m_toks[rdwr_toks->m_tok_cnt-1].m_text;	/* last tok */
 
-	if (!rdwr_tokens->m_token_cnt) {
+	if (!rdwr_toks->m_tok_cnt) {
 		return false;
 	}
 
-	for (i=0; i<DASM_TOKEN_MAX_LEN; ++i) {
-		if (token[i] == '\0') {
+	for (i=0; i<DASM_TOK_MAX_LEN; ++i) {
+		if (tok[i] == '\0') {
 			/* Boundary check */
-			if (i+1 >= DASM_TOKEN_MAX_LEN) {
+			if (i+1 >= DASM_TOK_MAX_LEN) {
 				return false;
 			}
-			token[i] = c_c;
-			token[i+1] = '\0';
+			tok[i] = c_c;
+			tok[i+1] = '\0';
 
 			return true;
 		}
@@ -63,86 +63,108 @@ static inline bool dasm_insert_token_char(struct dasm_token_line rdwr_tokens[], 
 	return false;
 }
 
-/* Set last token's token type. Doesn't create new token */
-static inline bool dasm_set_token_type(struct dasm_token_line rdwr_tokens[], const enum DASM_TOKEN_TYPE_ c_token_type)
+/* Set last tok's tok type. Doesn't create new tok */
+static inline bool dasm_set_tok_type(struct dasm_tok_line rdwr_toks[], const enum DASM_TOK_TYPE_ c_tok_type)
 {
-	if (!rdwr_tokens->m_token_cnt) {
+	if (!rdwr_toks->m_tok_cnt) {
 		return false;
 	}
 
-	rdwr_tokens->m_tokens[rdwr_tokens->m_token_cnt-1].m_token_type = c_token_type;
+	rdwr_toks->m_toks[rdwr_toks->m_tok_cnt-1].m_tok_type = c_tok_type;
 	return true;
 }
 
-static libdice_word_t dasm_tokenize_line(struct dasm_token_line rdwr_tokens[], const char rd_src[], const libdice_word_t c_src_len)
+static enum DASM_TOK_ERR_ dasm_tokenize_line(struct dasm_tok_line rdwr_toks[], 
+		const char rd_src[], const libdice_word_t c_src_len,
+		libdice_word_t *rdwr_read_cnt)
 {
 	libdice_word_t read_cnt = 0;
 	enum e_tokenizer_state state = TOKENIZER_STATE_IDLE;
 	libdice_word_t char_cnt = 0;
 
-	dasm_init_token_line(rdwr_tokens);
+	dasm_init_tok_line(rdwr_toks);
 	
-	for (read_cnt=0; read_cnt<c_src_len;) {
+	for (read_cnt=0;  read_cnt<c_src_len;) {
 		const char c = rd_src[read_cnt];
 		switch (state)
 		{
 			case TOKENIZER_STATE_IDLE:
+				if (!dasm_create_new_tok(rdwr_toks)) {
+					goto memory_insufficient;
+				}
+
 				if (c==' ') {
 					read_cnt++;
 				} else if (c=='\n') {
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_EOL);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_EOL);
 					read_cnt++;
-					return read_cnt;
+					
+					*rdwr_read_cnt = read_cnt; 
+					return DASM_TOK_ERR_OK;
 				} else if (c=='*' || c=='#') {	
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_OPERATOR);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_OPERATOR);
 					state = TOKENIZER_STATE_OPERATOR;
 					read_cnt++;
-				} else if (is_alphabet(c) || c=='_') {
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_IDENT);
+				} else if (isalpha((unsigned char)c) || c=='_') {
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_IDENT);
 					state = TOKENIZER_STATE_IDENT;
 					read_cnt++;
 				} else if (c=='\"') {
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_STRING);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_STRING);
 					state = TOKENIZER_STATE_STRING;
 					read_cnt++;
 				} else if (c=='\'') {
-					/* TODO : Don't copy single quote */
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_CHAR);
-					state = TOKENIZER_STATE_CHAR;
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_ASCII);
+					state = TOKENIZER_STATE_ASCII;
 					char_cnt = 0;
 					read_cnt++;
 				} else if (c=='\0') {
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_EOP);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_EOP);
 					read_cnt++;
-					return read_cnt;
-				} else if (is_number(c) || c=='-') {
-					dasm_create_new_token(rdwr_tokens);
-					dasm_insert_token_char(rdwr_tokens, c);
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_NUMBER);
+					
+					*rdwr_read_cnt = read_cnt;
+					return DASM_TOK_ERR_OK;
+				} else if (isdigit((unsigned char)c) || c=='-') {
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_NUMBER);
 					state = TOKENIZER_STATE_NUMBER;
 					read_cnt++;
 				} else {
-					assert(0);
+					if(!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_UNKNOWN);
+					read_cnt++;
+
+					*rdwr_read_cnt = read_cnt;
+					return DASM_TOK_ERR_INVAL_CHAR;
 				}
 				break;
 			case TOKENIZER_STATE_IDENT:
-				if (is_alphabet(c) || is_number(c) || c=='_') {
-					dasm_insert_token_char(rdwr_tokens, c);
+				if (isalpha((unsigned char)c) || isdigit((unsigned char)c) || c=='_') {
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 				} else if (c==':') {
-					dasm_set_token_type(rdwr_tokens, DASM_TOKEN_TYPE_LABEL);
+					dasm_set_tok_type(rdwr_toks, DASM_TOK_TYPE_LABEL);
 					state = TOKENIZER_STATE_IDLE;
 					read_cnt++;
 				} else {
@@ -150,69 +172,92 @@ static libdice_word_t dasm_tokenize_line(struct dasm_token_line rdwr_tokens[], c
 				}
 				break;
 			case TOKENIZER_STATE_NUMBER:
-				if (is_number(c)) {
-					dasm_insert_token_char(rdwr_tokens, c);
+				if (isdigit((unsigned char)c)) {
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 				} else {
 					state = TOKENIZER_STATE_IDLE;
 				}
 				break;
 			case TOKENIZER_STATE_STRING:
-				assert(c!='\n' && c!='\0');
+				if (c == '\n' || c == '\0') {
+					*rdwr_read_cnt = read_cnt;
+					return DASM_TOK_ERR_INVAL_STRING;
+				}
 				/* TODO : escape sequence handling  */
 				if (c=='\"') {
-					dasm_insert_token_char(rdwr_tokens, c);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 					state = TOKENIZER_STATE_IDLE;
 				} else {
-					dasm_insert_token_char(rdwr_tokens, c);
+					if(!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 				}
 				break;
-			case TOKENIZER_STATE_CHAR:
-				/* TODO : Don't copy single quote */
+			case TOKENIZER_STATE_ASCII:
 				if (char_cnt==1 && c=='\'') {
-					dasm_insert_token_char(rdwr_tokens, c);
 					read_cnt++;
 					state = TOKENIZER_STATE_IDLE;
-				} else if (char_cnt == 0 && isascii(c)) {
-					dasm_insert_token_char(rdwr_tokens, c);
+				} else if (char_cnt == 0 && isascii((unsigned char)c)) {
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 					char_cnt++;
 				} else {
-					return DASM_ERR_RET;		/* not 1 character or Non ascii */
+					*rdwr_read_cnt = read_cnt;
+					return DASM_TOK_ERR_INVAL_ASCII;		/* not 1 character or Non ascii */
 				}
 				break;
 			case TOKENIZER_STATE_OPERATOR:
 				if (c=='*') {
-					dasm_insert_token_char(rdwr_tokens, c);
+					if (!dasm_insert_tok_char(rdwr_toks, c)) {
+						goto memory_insufficient;
+					}
 					read_cnt++;
 				} else {
 					state = TOKENIZER_STATE_IDLE;
 				}
 				break;
 			default:
-				assert(0);
-				break;
+				*rdwr_read_cnt = read_cnt;
+				return DASM_TOK_ERR_UNKNOWN;	
 		}
 		
 		
 	}
-	return read_cnt;
+	
+	*rdwr_read_cnt = read_cnt;
+
+	if (read_cnt == c_src_len) {
+		return DASM_TOK_ERR_NO_TERM;
+	}
+
+	return DASM_TOK_ERR_UNKNOWN;
+
+memory_insufficient:
+	*rdwr_read_cnt = read_cnt;
+	return DASM_TOK_ERR_MEM_INSUF;
 }
 
 
 /**
  * @brief Reports the size occupied by the program in words.
  * * */
-DICEIMPL libdice_word_t dasm_get_token_line_word_len(const struct dasm_token_line *rd_token_line)
+DICEIMPL libdice_word_t dasm_get_tok_line_word_len(const struct dasm_tok_line *rd_tok_line)
 {
 	libdice_word_t i = 0;
 	libdice_word_t word_len = 0;
 	
-	for (i=0; i<rd_token_line->m_token_cnt; i++) {
-		const enum DASM_TOKEN_TYPE_ token_type = rd_token_line->m_tokens[i].m_token_type;
-		if (token_type == DASM_TOKEN_TYPE_LABEL || token_type == DASM_TOKEN_TYPE_EOL || token_type == DASM_TOKEN_TYPE_EOP) {
+	for (i=0; i<rd_tok_line->m_tok_cnt; i++) {
+		const enum DASM_TOK_TYPE_ tok_type = rd_tok_line->m_toks[i].m_tok_type;
+		if (tok_type == DASM_TOK_TYPE_LABEL || tok_type == DASM_TOK_TYPE_EOL || tok_type == DASM_TOK_TYPE_EOP) {
 			continue;
 		}
 		word_len++;
@@ -220,29 +265,47 @@ DICEIMPL libdice_word_t dasm_get_token_line_word_len(const struct dasm_token_lin
 	return word_len;
 }
 
-DICEIMPL libdice_word_t dasm_tokenize_programme(struct dasm_token_line rdwr_token_lines[], const libdice_word_t c_token_lines_len, const char rd_src[], const libdice_word_t c_src_len)
+DICEIMPL struct dasm_tok_ret dasm_tokenize_programme(struct dasm_tok_line rdwr_tok_lines[], const libdice_word_t c_tok_lines_len,
+		const char rd_src[], const libdice_word_t c_src_len,
+		libdice_word_t *rdwr_tok_line_cnt)
 {
-	libdice_word_t read_cnt = 0;
-	libdice_word_t token_line_cnt = 0;
-	libdice_word_t read_src_len;
-	read_src_len = (libdice_word_t)strlen(rd_src) + 1;
+	/** 
+	 * @brief rdwr_tok_lines's count
+	 * */
+	libdice_word_t line_cnt = 0;
+        libdice_word_t tok_line_cnt = 0;
+        libdice_word_t read_cnt = 0;
 
-	while (read_cnt < c_src_len) {
+	libdice_word_t real_src_len = 0;
+	struct dasm_tok_ret ret;
+
+	real_src_len = (libdice_word_t)strlen(rd_src) + 1;
+	
+	if (real_src_len > c_src_len) {
+		real_src_len = c_src_len;
+	}
+
+
+	while (tok_line_cnt < c_tok_lines_len && read_cnt < real_src_len) {
 		libdice_word_t tmp_read_cnt = 0;
-		if (token_line_cnt + 1 > c_token_lines_len) {
-			return DASM_ERR_RET;
-		}
-		tmp_read_cnt = dasm_tokenize_line(&rdwr_token_lines[token_line_cnt], rd_src+read_cnt, c_src_len-read_cnt);
-		if (tmp_read_cnt == DASM_ERR_RET) {
-			return DASM_ERR_RET;
-		}
-		read_cnt += tmp_read_cnt;
-		token_line_cnt++;
 
-		if (read_cnt >= read_src_len) {
+		ret.err = dasm_tokenize_line(&rdwr_tok_lines[tok_line_cnt],
+						rd_src+read_cnt, real_src_len-read_cnt,
+						&tmp_read_cnt);
+		read_cnt += tmp_read_cnt;
+		line_cnt++;
+		if (rdwr_tok_lines[tok_line_cnt].m_tok_cnt) {
+			tok_line_cnt++;
+		}
+		
+		if (ret.err != DASM_TOK_ERR_OK) {
 			break;
 		}
-	} 
 
-	return token_line_cnt;
+	}
+	
+	*rdwr_tok_line_cnt = tok_line_cnt;
+	ret.line_cnt = line_cnt;
+
+	return ret;
 }

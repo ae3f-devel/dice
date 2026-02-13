@@ -1,17 +1,19 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+
 #include "parser.h"
+#include "tokenizer.h"
 #include <string.h>
 #include <dasm/keys.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
 
 
-/* TODO : Checks whether the label appears only in the first token of line*/
 
 #define PARSER_MAX_LABEL_CNT 1000
 
 struct dasm_label {
-	char m_text[DASM_TOKEN_MAX_LEN];
+	char m_text[DASM_TOK_MAX_LEN];
 	libdice_word_t m_address;
 };
 
@@ -21,7 +23,7 @@ struct dasm_label_table {
 };
 
 struct dasm_opcode_define {
-	const char m_mnemonic[DASM_TOKEN_MAX_LEN];
+	const char m_mnemonic[DASM_TOK_MAX_LEN];
 	const enum LIBDICE_OPCODE_ m_opcode;
 	const libdice_word_t m_operand_cnt;
 };
@@ -100,7 +102,7 @@ static const struct dasm_opcode_define s_opcode_define_table[LIBDICE_OPCODE_CNT]
 };
 
 
-static void dasm_init_label_table(struct dasm_label_table rdwr_label_table[])
+static void dasm_init_label_table(struct dasm_label_table *rdwr_label_table)
 {
 	rdwr_label_table->m_label_cnt = 0;
 	memset(rdwr_label_table->m_labels, 0, sizeof(struct dasm_label) * PARSER_MAX_LABEL_CNT);
@@ -126,41 +128,44 @@ static bool dasm_insert_label(struct dasm_label_table *rdwr_label_table, const c
 		return false;
 	}
 
-	strncpy(rdwr_label_table->m_labels[rdwr_label_table->m_label_cnt].m_text, c_label, DASM_TOKEN_MAX_LEN);
+	strncpy(rdwr_label_table->m_labels[rdwr_label_table->m_label_cnt].m_text, c_label, DASM_TOK_MAX_LEN-1);
 	rdwr_label_table->m_labels[rdwr_label_table->m_label_cnt].m_address = c_addr;
 	rdwr_label_table->m_label_cnt++;
 
 	return true;	
 }
 
-static bool dasm_label_programme(struct dasm_label_table *rdwr_label_table, const struct dasm_token_line rd_token_lines[], const libdice_word_t c_token_lines_len)
+static enum DASM_PARSER_ERR_ dasm_label_programme(struct dasm_label_table *rdwr_label_table, const struct dasm_tok_line rd_tok_lines[], const libdice_word_t c_tok_lines_len)
 {
-	libdice_word_t token_lines_idx = 0;
+	libdice_word_t tok_lines_idx = 0;
 	libdice_word_t tmp = 0;
 	libdice_word_t pc = 0;
-	
+
 	dasm_init_label_table(rdwr_label_table);
 
-	for (token_lines_idx=0; token_lines_idx<c_token_lines_len; token_lines_idx++) {
-		const struct dasm_token_line *rd_token_line = &(rd_token_lines[token_lines_idx]);
+	for (tok_lines_idx=0; tok_lines_idx<c_tok_lines_len; tok_lines_idx++) {
+		const struct dasm_tok_line *rd_tok_line = &(rd_tok_lines[tok_lines_idx]);
 
-		assert(rd_token_line->m_token_cnt > 0);
-		if (rd_token_line->m_tokens[0].m_token_type == DASM_TOKEN_TYPE_LABEL) {
-			/* label must be defined only once */
-			if (dasm_get_label_address(rdwr_label_table, rd_token_line->m_tokens[0].m_text, &tmp)) {
-				return false;
-			}
-			dasm_insert_label(rdwr_label_table, rd_token_line->m_tokens[0].m_text, pc);
+		if (rd_tok_line->m_tok_cnt == 0) {
+			continue;
 		}
-		pc += dasm_get_token_line_word_len(rd_token_line);
+		
+		if (rd_tok_line->m_toks[0].m_tok_type == DASM_TOK_TYPE_LABEL) {
+			/* label must be defined only once */
+			if (dasm_get_label_address(rdwr_label_table, rd_tok_line->m_toks[0].m_text, &tmp)) {
+				return DASM_PARSER_ERR_INVAL_LABEL;
+			}
+			dasm_insert_label(rdwr_label_table, rd_tok_line->m_toks[0].m_text, pc);
+		}
+		pc += dasm_get_tok_line_word_len(rd_tok_line);
 
-		if (rd_token_line->m_tokens[rd_token_line->m_token_cnt-1].m_token_type == DASM_TOKEN_TYPE_EOP) {
-			return true;
+		if (rd_tok_line->m_toks[rd_tok_line->m_tok_cnt-1].m_tok_type == DASM_TOK_TYPE_EOP) {
+			return DASM_PARSER_ERR_OK;
 		}
 	}
 
 	/* Couldn't find EOP */
-	return false;
+	return DASM_PARSER_ERR_NO_TERM;
 }
 
 static bool dasm_get_opcode_table_idx(const char rd_mnemonic[], libdice_word_t *rdwr_idx)
@@ -182,176 +187,167 @@ static void dasm_init_parsed_line(struct dasm_parsed_line *rdwr_parsed_line)
 	rdwr_parsed_line->m_operand_cnt = 0;
 }
 
-/**
- * @return  1==success parsing, 0==failed parsing, DASM_ERR_RET==error
- */
-static libdice_word_t dasm_parse_operand(struct dasm_operand *rdwr_operand, const struct dasm_token *rd_token, 
-				const struct dasm_label_table *rd_label_table)
+
+static enum DASM_PARSER_ERR_ dasm_parse_operand(struct dasm_operand *rdwr_operand, const struct dasm_tok *rd_tok, 
+		const struct dasm_label_table *rd_label_table)
 {
-	switch (rd_token->m_token_type) 
-		{
-			case DASM_TOKEN_TYPE_IDENT:
+	switch (rd_tok->m_tok_type) 
+	{
+		case DASM_TOK_TYPE_IDENT:
 			{
 				libdice_word_t label_addr = 0;
-				
-				if (dasm_get_label_address(rd_label_table, rd_token->m_text, &label_addr)) {
-					/* This token is label */
+
+				if (dasm_get_label_address(rd_label_table, rd_tok->m_text, &label_addr)) {
+					/* This tok is label */
 					int tmp = 0;
-					tmp = snprintf(rdwr_operand->m_text, DASM_TOKEN_MAX_LEN, "%u", label_addr);
-					if (tmp >= DASM_TOKEN_MAX_LEN || tmp<0) {
-						return DASM_ERR_RET;
+					tmp = snprintf(rdwr_operand->m_text, DASM_TOK_MAX_LEN, "%u", label_addr);
+					if (tmp >= DASM_TOK_MAX_LEN || tmp<0) {
+						return DASM_PARSER_ERR_INVAL_LABEL;
 					}
-					return 1;
+					return DASM_PARSER_ERR_OK;
 				}
-				/* This token is opcode */
-				strncpy(rdwr_operand->m_text, rd_token->m_text, DASM_TOKEN_MAX_LEN);
-				return 1;
+				/* This tok is opcode */
+				strncpy(rdwr_operand->m_text, rd_tok->m_text, DASM_TOK_MAX_LEN-1);
+				return DASM_PARSER_ERR_OK;
 			}
-			case DASM_TOKEN_TYPE_NUMBER:
-				strncpy(rdwr_operand->m_text, rd_token->m_text, DASM_TOKEN_MAX_LEN);
-				return 1;
-			case DASM_TOKEN_TYPE_LABEL:
-				/* label must be handled by  dasm_parse_line. This means the label was placed in the middle of the line, not at the beginning*/
-				return DASM_ERR_RET;
-			case DASM_TOKEN_TYPE_STRING:
-				/* Doesn't support string yet*/
-				return DASM_ERR_RET;
-			case DASM_TOKEN_TYPE_CHAR:
+		case DASM_TOK_TYPE_NUMBER:
+			strncpy(rdwr_operand->m_text, rd_tok->m_text, DASM_TOK_MAX_LEN-1);
+			return DASM_PARSER_ERR_OK;
+		case DASM_TOK_TYPE_LABEL:
+			/* label must be handled by  dasm_parse_line. This means the label was placed in the middle of the line, not at the beginning*/
+			return DASM_PARSER_ERR_INVAL_LABEL;
+		case DASM_TOK_TYPE_STRING:
+			/* Doesn't support string yet*/
+			return DASM_PARSER_ERR_UNKNOWN;
+		case DASM_TOK_TYPE_ASCII:
 			{
 				int tmp = 0;
-				tmp = snprintf(rdwr_operand->m_text, DASM_TOKEN_MAX_LEN, "%u", (unsigned)(unsigned char)rd_token->m_text[1]);
-				if (tmp >= DASM_TOKEN_MAX_LEN || tmp<0) {
-					return DASM_ERR_RET;
+				tmp = snprintf(rdwr_operand->m_text, DASM_TOK_MAX_LEN, "%u", (unsigned)(unsigned char)rd_tok->m_text[0]);
+				if (tmp >= DASM_TOK_MAX_LEN || tmp<0) {
+					return DASM_PARSER_ERR_INVAL_ASCII;
 				}
-				return 1;
+				return DASM_PARSER_ERR_OK;
 			}
-			case DASM_TOKEN_TYPE_OPERATOR:
+		case DASM_TOK_TYPE_OPERATOR:
 			{
 				int tmp = 0;
-				if (rdwr_operand->m_text[0] == '#') {
+				if (rd_tok->m_text[0] == '#') {
 					if (strlen(rdwr_operand->m_text) == 1) {
-						tmp = snprintf(rdwr_operand->m_text, DASM_TOKEN_MAX_LEN, "%u", (unsigned)0);
-						if (tmp >= DASM_TOKEN_MAX_LEN || tmp<0) {
-							return DASM_ERR_RET;
+						tmp = snprintf(rdwr_operand->m_text, DASM_TOK_MAX_LEN, "%u", (unsigned)0);
+						if (tmp >= DASM_TOK_MAX_LEN || tmp<0) {
+							return DASM_PARSER_ERR_INVAL_OPERATOR;
 						}
-						return 1;
+						return DASM_PARSER_ERR_OK;
 					} else {
-						return DASM_ERR_RET;
+						return DASM_PARSER_ERR_INVAL_OPERATOR;
 					}
 				}
-				tmp = snprintf(rdwr_operand->m_text, DASM_TOKEN_MAX_LEN, "%u", (unsigned)strlen(rd_token->m_text));
-				if (tmp >= DASM_TOKEN_MAX_LEN || tmp<0) {
-					return DASM_ERR_RET;
+				tmp = snprintf(rdwr_operand->m_text, DASM_TOK_MAX_LEN, "%u", (unsigned)strlen(rd_tok->m_text));
+				if (tmp >= DASM_TOK_MAX_LEN || tmp<0) {
+					return DASM_PARSER_ERR_INVAL_OPERATOR;
 				}
-				return 1;
+				return DASM_PARSER_ERR_OK;
 			}
-			case DASM_TOKEN_TYPE_EOL:
-				return 0;
-			case DASM_TOKEN_TYPE_EOP:
-				return 0;
-			default:
-				assert(0);
-				return DASM_ERR_RET;
-		}
+		case DASM_TOK_TYPE_EOL:
+		case DASM_TOK_TYPE_EOP:
+			return DASM_PARSER_ERR_OK;
+		case DASM_TOK_TYPE_UNKNOWN:
+		default:
+			return DASM_PARSER_ERR_INVAL_TOK;
+	}
 }
 
-/**
- * @return 1==success parsing, 0==failed parsing, DASM_ERR_RET==error
- * * */ 
-static libdice_word_t dasm_parse_line(struct dasm_parsed_line *rdwr_parsed_line, const struct dasm_token_line *rd_token_line, 
-					const struct dasm_label_table *rd_label_table)
+static enum DASM_PARSER_ERR_ dasm_parse_line(struct dasm_parsed_line *rdwr_parsed_line, const struct dasm_tok_line *rd_tok_line, 
+		const struct dasm_label_table *rd_label_table)
 {
-	libdice_word_t token_line_idx = 0;
+	libdice_word_t tok_line_idx = 0;
 	libdice_word_t opcode_table_idx = 0;
-	const struct dasm_token *rd_token = NULL;
+	const struct dasm_tok *rd_tok = NULL;
 	libdice_word_t tmp_operand_cnt = 0;
+	enum DASM_PARSER_ERR_ errcode = DASM_PARSER_ERR_OK;
 
 	dasm_init_parsed_line(rdwr_parsed_line);
 
-	if (rd_token_line->m_token_cnt == 0) {
-		assert(0);
-		return DASM_ERR_RET;	/* Shouldn't reach here*/
+	if (rd_tok_line->m_tok_cnt == 0 || rd_tok_line->m_tok_cnt >= DASM_TOK_MAX_CNT_PER_LINE) {
+		return DASM_PARSER_ERR_NO_TERM;
 	}
 
-	if (rd_token_line->m_token_cnt==1
-		&& (rd_token_line->m_tokens[0].m_token_type==DASM_TOKEN_TYPE_EOL 
-		|| rd_token_line->m_tokens[0].m_token_type==DASM_TOKEN_TYPE_EOP)) {
-		return 0;
+	if (rd_tok_line->m_tok_cnt==1
+			&& (rd_tok_line->m_toks[0].m_tok_type==DASM_TOK_TYPE_EOL 
+				|| rd_tok_line->m_toks[0].m_tok_type==DASM_TOK_TYPE_EOP)) {
+		return DASM_PARSER_ERR_OK;
 	}
 
-	/* Skip label token */
-	if (rd_token_line->m_tokens[0].m_token_type == DASM_TOKEN_TYPE_LABEL) {
-		token_line_idx++;
+	/* Skip label tok */
+	if (rd_tok_line->m_toks[0].m_tok_type == DASM_TOK_TYPE_LABEL) {
+		tok_line_idx++;
 	}
 
-	rd_token = &(rd_token_line->m_tokens[token_line_idx]);
-	token_line_idx++;
+	rd_tok = &(rd_tok_line->m_toks[tok_line_idx]);
+	tok_line_idx++;
 
 	/* Check whether the line contains only a label */
-	if (rd_token->m_token_type==DASM_TOKEN_TYPE_EOL || rd_token->m_token_type==DASM_TOKEN_TYPE_EOP) {
-		return 0;
+	if (rd_tok->m_tok_type==DASM_TOK_TYPE_EOL || rd_tok->m_tok_type==DASM_TOK_TYPE_EOP) {
+		return DASM_PARSER_ERR_OK;
 	}
-	
+
 	/* opcode must be found in opcode_table */
-	if (!dasm_get_opcode_table_idx(rd_token->m_text, &opcode_table_idx)) {
-		return DASM_ERR_RET;
+	if (!dasm_get_opcode_table_idx(rd_tok->m_text, &opcode_table_idx)) {
+		return DASM_PARSER_ERR_INVAL_OPCODE;
 	}
 	rdwr_parsed_line->m_opcode = s_opcode_define_table[opcode_table_idx].m_opcode;
 	rdwr_parsed_line->m_operand_cnt = s_opcode_define_table[opcode_table_idx].m_operand_cnt;
-	
-	tmp_operand_cnt = 0;
-	for (; token_line_idx<rd_token_line->m_token_cnt; token_line_idx++) {
-		libdice_word_t tmp = 0;
-		rd_token = &(rd_token_line->m_tokens[token_line_idx]);
-		/* boundary check */
 
-		tmp = dasm_parse_operand(&(rdwr_parsed_line->m_operands[tmp_operand_cnt]), rd_token, rd_label_table);
-		if (tmp == DASM_ERR_RET) {
-			return DASM_ERR_RET;
+	tmp_operand_cnt = 0;
+	for (;tok_line_idx<rd_tok_line->m_tok_cnt; tok_line_idx++) {
+
+		rd_tok = &(rd_tok_line->m_toks[tok_line_idx]);
+
+		if (tmp_operand_cnt >= LIBDICE_OPERAND_MAX_CNT) {
+			return DASM_PARSER_ERR_INVAL_INSTRUCTION;
 		}
-		if (tmp) {
-			if (tmp_operand_cnt+1 > LIBDICE_OPERAND_MAX_CNT) {
-				return DASM_ERR_RET;
-			}
-			tmp_operand_cnt++;
+
+		errcode = dasm_parse_operand(&(rdwr_parsed_line->m_operands[tmp_operand_cnt]), rd_tok, rd_label_table);	
+		tmp_operand_cnt++;
+		if (errcode != DASM_PARSER_ERR_OK) {
+			return errcode;
 		}
 	}
 	if (tmp_operand_cnt != rdwr_parsed_line->m_operand_cnt) {
-		return DASM_ERR_RET;
-	}
-	return 1;
+		return DASM_PARSER_ERR_INVAL_INSTRUCTION;
+	}	
+	return errcode; 
 } 
 
 
-DICEIMPL libdice_word_t dasm_parse_programme(struct dasm_parsed_line rdwr_parsed_lines[], const libdice_word_t c_parsed_lines_len, 
-					const struct dasm_token_line rd_token_lines[], const libdice_word_t c_token_lines_len)
+DICEIMPL struct dasm_parser_ret dasm_parse_programme(struct dasm_parsed_line rdwr_parsed_lines[], const libdice_word_t c_parsed_lines_len, 
+		const struct dasm_tok_line rd_tok_lines[], const libdice_word_t c_tok_lines_len,
+		libdice_word_t *rdwr_parsed_line_cnt)
 {
-	libdice_word_t token_line_cnt = 0;
+	libdice_word_t line_cnt = 0;
 	libdice_word_t parsed_line_cnt = 0;
+	libdice_word_t tok_line_cnt = 0;
 	struct dasm_label_table label_table;
+	struct dasm_parser_ret ret;
 
 	dasm_init_label_table(&label_table);
-	if (!dasm_label_programme(&label_table, rd_token_lines, c_token_lines_len)) {
-		return DASM_ERR_RET;
+	ret.m_err = dasm_label_programme(&label_table, rd_tok_lines, c_tok_lines_len);
+	if (ret.m_err != DASM_PARSER_ERR_OK) {
+		*rdwr_parsed_line_cnt = 0;
+		return ret;
 	}
 
-	for (token_line_cnt=0; token_line_cnt<c_token_lines_len; token_line_cnt++) {
-		libdice_word_t tmp = 0;
-		/* boundary check */
-		if (parsed_line_cnt+1 > c_parsed_lines_len) {
-			return DASM_ERR_RET;
+	for (tok_line_cnt=0; parsed_line_cnt<c_parsed_lines_len && tok_line_cnt<c_tok_lines_len; ++tok_line_cnt) {
+		ret.m_err = dasm_parse_line(&rdwr_parsed_lines[parsed_line_cnt], &rd_tok_lines[tok_line_cnt], &label_table);
+		parsed_line_cnt++;
+		line_cnt++;
+		if (ret.m_err != DASM_PARSER_ERR_OK) {
+			break;
 		}
-		tmp = dasm_parse_line(&rdwr_parsed_lines[parsed_line_cnt], &rd_token_lines[token_line_cnt], &label_table);
-		if (tmp == DASM_ERR_RET) {
-			return DASM_ERR_RET;
-		}
-		if (tmp) {
-			parsed_line_cnt++;
-		}
- 	}
-
-	return parsed_line_cnt;
+	}
 	
+	*rdwr_parsed_line_cnt = parsed_line_cnt;
+	ret.m_line_cnt = line_cnt;
 
-
+	return ret;
 }

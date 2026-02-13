@@ -13,7 +13,8 @@ enum DASM_PP_ERR_ {
 	 * @brief No '\n' and '\0'
 	 * NO_TERMINATION
 	 * */
-	DASM_PP_ERR_NO_TERM
+	DASM_PP_ERR_NO_TERM,
+	DASM_PP_ERR_UNCLOSED_BLOCK_COMMENT
 };
 
 struct dasm_pp_ret {
@@ -22,7 +23,7 @@ struct dasm_pp_ret {
 };
 
 DICECALL struct dasm_pp_ret dasm_preprocess_programme(char rdwr_dst[], const libdice_word_t c_dst_len,
-							const char rd_src[], const libdice_word_t c_src_len,
-							libdice_word_t *rdwr_write_cnt);
+		const char rd_src[], const libdice_word_t c_src_len,
+		libdice_word_t *rdwr_write_cnt);
 
 #endif /* dasm_pp_h */

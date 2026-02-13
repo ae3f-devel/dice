@@ -8,7 +8,7 @@
 #include <libdice/abi.h>
 
 #define DASM_PROGRAMME_MAX_LEN 200 
-#define DASM_ERR_RET ((libdice_word_t)(-1))
+#define DASM_ERR_RET ((libdice_word_t)-1)
 
 
 ae2f_extern DICECALL libdice_word_t dasm_assemble(
