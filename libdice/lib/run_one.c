@@ -695,7 +695,6 @@ DICEIMPL libdice_ctx libdice_run_one(
 				c_ctx.m_state = LIBDICE_CTX_STRINVAL;
 				return c_ctx;
 			}
-
 			/* find same key */
 			for (i = 0; i < c_ctx.m_lookup_used; i += LIBDICE_LOOKUP_SECTION_WORD_LEN)
 			{
@@ -736,10 +735,25 @@ DICEIMPL libdice_ctx libdice_run_one(
 			c89atomic_fetch_and_32(rdwr_a32lck, 0);
 			return c_ctx;
 		}
-
 		case LIBDICE_OPCODE_RAND:
 		{
-			assert(0 && "noimp: LIBDICE_OPCODE_RAND");
+			libdice_word_t x;
+			__deref(O0, 1);
+
+			ae2f_expected_but_else(O0 < c_num_ram)
+			{
+				c_ctx.m_state = LIBDICE_CTX_DEREFINVAL;
+				return c_ctx;
+			}
+
+			x = rdwr_ram[O0];
+
+			x ^= x << 13;
+			x ^= x >> 17;
+			x ^= x << 5;
+
+			rdwr_ram[O0] = x;
+
 			c_ctx.m_pc += 3;
 			return c_ctx;
 		}

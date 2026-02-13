@@ -32,7 +32,6 @@ if(NOT TARGET ae3f::libdice)
 	ae2f_CoreLibFetchX(ae3f dice master)
 endif()
 
-ae2f_CoreLibFetchX(ae2f Sys main)
 ae2f_Macro_init(1 30 30)
 ae2f_Macro_Lib_V2(
 	ae3f rolladie STATIC
@@ -43,6 +42,6 @@ ae2f_Macro_Lib_V2(
 	inc ON
 	)
 
-target_link_libraries(ae3f-rolladie ae3f::dasm ae2f::Sys)
+target_link_libraries(ae3f-rolladie ae3f::libdice)
 ae2f_UltraErrWERROR(ae3f-rolladie PRIVATE)
 ae2f_CoreTestTentVerbose(ae3f-rolladie test)

@@ -321,7 +321,7 @@ enum LIBDICE_OPCODE_
 
 	/**
 	 * 	@brief	get time as u32
-	 * 	@detail	dst
+	 * 	@details dst
 	 * */
 	LIBDICE_OPCODE_TIME,
 
