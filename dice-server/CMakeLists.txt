@@ -41,3 +41,4 @@ add_executable(dice-server
 ae2f_UltraErrWERROR(dice-server PRIVATE)
 
 target_link_libraries(dice-server ae3f::rolladie)
+target_include_directories(dice-server PRIVATE inc)

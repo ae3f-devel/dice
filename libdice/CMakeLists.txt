@@ -1,5 +1,6 @@
 # ===============================================
 
+cmake_minimum_required(VERSION 3.10)
 enable_testing()
 
 # Set this source directory as the tree root for project.
@@ -22,7 +23,6 @@ endif()
 
 # ===============================================
 
-cmake_minimum_required(VERSION 3.10)
 project(libdice VERSION 0)
 
 file(GLOB_RECURSE libdice_c ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)

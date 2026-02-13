@@ -51,45 +51,16 @@ static E_LIBDICE_CTX_t	__puts(
 int main(void) {
 	libdice_ctx	CONTEXT;
 	libdice_word_t	PROGRAMME[] = {
-		LIBDICE_OPCODE_NOP,
-		/** eq 1, 0, 0 */
-		LIBDICE_OPCODE_EQ, 1, 0, 0, 0, 0,
-		/** puti *1 ; expected 1 */
-		LIBDICE_OPCODE_PUTI, 1, 1,
-		/** putc '\n' */
-		LIBDICE_OPCODE_PUTC, 0, '\n',
-		/** set 1, 3 */
-		LIBDICE_OPCODE_SET, 1, 3,
-		/** set 2, 3 */
-		LIBDICE_OPCODE_SET, 2, 3,
-
-		/** bxor 3, *1, *2 */
-		LIBDICE_OPCODE_BXOR, 3, 1, 1, 1, 2,
-		/** puti *3 */
-		LIBDICE_OPCODE_PUTI, 1, 3,
-
-		/** band 3, *1, *2 */
-		LIBDICE_OPCODE_BAND, 3, 1, 1, 1, 2,
-		/** puti *3 */
-		LIBDICE_OPCODE_PUTI, 1, 3,
-
-		/** putc '\n' */
-		LIBDICE_OPCODE_PUTC, 0, '\n',
-		LIBDICE_OPCODE_JMPZA, 0, 0, 0, 6,
-
-		/** now this is skipped */
-		LIBDICE_OPCODE_EOP,
-		/** ============================= */
-
-		/** set 0, ???; "hi" as uint32 */
-		LIBDICE_OPCODE_SET, 0, (u32_least)'h' | ((u32_least)'i' << 8),
-		/** puts 0 */
-		LIBDICE_OPCODE_PUTS, 0, 0,
-		LIBDICE_OPCODE_EOP,
+		0, 
+		1, 111, 1, 111, 0, 1, 
+		39, 112, 1, 111, 0, 8, 
+		44, 1, 111, 
+		18, 1, 112, 0, 0,
+		LIBDICE_OPCODE_EOP 
 	};
 	libdice_put_interface	INTERFACE;
 
-	libdice_word_t	RAM[100];
+	libdice_word_t	RAM[120];
 	libdice_word_t	LOOKUP[100];
 	c89atomic_uint32	LCK;
 

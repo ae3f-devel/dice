@@ -284,22 +284,22 @@ static ae2f_inline ae2f_ccconst __result __two_const(
 
 		case LIBDICE_OPCODE_JMPZ:
 			RET.m_ctx.m_pc = c_operand
-				? RET.m_ctx.m_pc
+				? RET.m_ctx.m_pc - 1
 				: c_op1;
 
 			return RET;
 
 		case LIBDICE_OPCODE_JMPZA:
-			RET.m_ctx.m_pc += c_operand
-				? RET.m_ctx.m_pc - 6
-				: 0;
+			RET.m_ctx.m_pc = c_operand
+				? c_ctx.m_pc + c_op1
+				: c_ctx.m_pc + 5;
 
 			return RET;
 
 		case LIBDICE_OPCODE_JMPZN:
-			RET.m_ctx.m_pc -= c_operand
-				? RET.m_ctx.m_pc + 6
-				: 0;
+			RET.m_ctx.m_pc = c_operand
+				? c_ctx.m_pc - c_op1
+				: c_ctx.m_pc + 5;
 			return RET;
 
 		case LIBDICE_OPCODE_FGT:
