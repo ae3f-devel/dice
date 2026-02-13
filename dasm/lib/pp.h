@@ -18,8 +18,8 @@ enum DASM_PP_ERR_ {
 };
 
 struct dasm_pp_ret {
-	enum DASM_PP_ERR_ err;
-	libdice_word_t line_cnt;
+	enum DASM_PP_ERR_ m_err;
+	libdice_word_t m_line_cnt;
 };
 
 DICECALL struct dasm_pp_ret dasm_preprocess_programme(char rdwr_dst[], const libdice_word_t c_dst_len,

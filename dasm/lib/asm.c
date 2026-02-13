@@ -37,8 +37,8 @@ DICEIMPL libdice_word_t dasm_assemble(
 	}
 
 	pp_ret = dasm_preprocess_programme(tmp_buf, DASM_PROGRAMME_MAX_LEN, rd_programme, c_programme_len, &buf_cnt);
-	if (pp_ret.err != DASM_PP_ERR_OK) {
-		printf("[ERROR] pp_ret.m_err = %u\n", pp_ret.err);
+	if (pp_ret.m_err != DASM_PP_ERR_OK) {
+		printf("[ERROR] pp_ret.m_err = %u\n", pp_ret.m_err);
 		return DASM_ERR_RET;
 	}
 
