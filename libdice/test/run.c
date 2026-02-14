@@ -114,6 +114,19 @@ int main(void) {
 		LIBDICE_OPCODE_PUTF, 1, 14,
 		LIBDICE_OPCODE_PUTC, 0, '\n',
 
+		/* Print "Hello world" */
+		LIBDICE_OPCODE_PUTC, 0, 'H',
+		LIBDICE_OPCODE_PUTC, 0, 'e',
+		LIBDICE_OPCODE_PUTC, 0, 'l',
+		LIBDICE_OPCODE_PUTC, 0, 'l',
+		LIBDICE_OPCODE_PUTC, 0, 'o',
+		LIBDICE_OPCODE_PUTC, 0, ' ',
+		LIBDICE_OPCODE_PUTC, 0, 'w',
+		LIBDICE_OPCODE_PUTC, 0, 'o',
+		LIBDICE_OPCODE_PUTC, 0, 'r',
+		LIBDICE_OPCODE_PUTC, 0, 'l',
+		LIBDICE_OPCODE_PUTC, 0, 'd',
+		LIBDICE_OPCODE_PUTC, 0, '\n',
 		/* End of program */
 		LIBDICE_OPCODE_EOP,
 	};
@@ -144,7 +157,7 @@ int main(void) {
 			, LOOKUP, sizeof(LOOKUP) / sizeof(LOOKUP[0])
 			, &LCK);
 
-	printf("\nFinal State: %u\n", CONTEXT.m_state);
+	printf("Final State: %u\n", CONTEXT.m_state);
 	printf("Programme counter: %u\n", CONTEXT.m_pc);
 
 	return (int)CONTEXT.m_state;
