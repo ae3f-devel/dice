@@ -66,9 +66,7 @@
 #define LIBDASM_OPCODE_TXT_DEF        "def"
 #define LIBDASM_OPCODE_TXT_UNDEF      "undef"
 
-#define LIBDASM_OPCODE_TXT_SETRANDSEED "setrandseed"
-#define LIBDASM_OPCODE_TXT_IRAND      "irand"
-#define LIBDASM_OPCODE_TXT_FRAND      "frand"
+#define LIBDASM_OPCODE_TXT_RAND       "rand"
 
 #define LIBDASM_OPCODE_TXT_EOP        "eop"
 
