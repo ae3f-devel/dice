@@ -7,15 +7,11 @@ set(ae2f_ProjRoot ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Tree root for projec
 set(ae2f_submod  .submod CACHE STRING "Relative path to submodule (subdirectory)")
 set(ae2f_CoreScript_Wh ${ae2f_ProjRoot}/${ae2f_submod}/ae2f/CoreScript)
 
-# Execute git to fetch CoreScript when repository does not exist
+# Ensure CoreScript helper is available (fetch if missing)
 if(NOT EXISTS ${ae2f_CoreScript_Wh})
-	execute_process(
-		COMMAND git clone https://codeberg.org/ae2f/CoreScript
-		${ae2f_CoreScript_Wh}
-		)
+	execute_process(COMMAND git clone https://codeberg.org/ae2f/CoreScript ${ae2f_CoreScript_Wh})
 endif()
 
-# add subdirectory
 if(NOT TARGET ae2f::CoreScript)
 	add_subdirectory(${ae2f_CoreScript_Wh} ${ae2f_submod}/ae2f/CoreScript)
 endif()
@@ -23,21 +19,18 @@ endif()
 # ===============================================
 
 cmake_minimum_required(VERSION 3.10)
-project(libdice VERSION 0)
+project(dice)
 
-file(GLOB_RECURSE dice_lib ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)
-file(GLOB_RECURSE dice_inc ${CMAKE_CURRENT_SOURCE_DIR}/inc/*)
-file(GLOB_RECURSE dice_app ${CMAKE_CURRENT_SOURCE_DIR}/app/*)
+# sources
+file(GLOB_RECURSE dice_app ${CMAKE_CURRENT_SOURCE_DIR}/app/*.c)
+file(GLOB_RECURSE dice_inc ${CMAKE_CURRENT_SOURCE_DIR}/inc/*.h)
 
-if(NOT TARGET ae3f::libdice)
-	ae2f_CoreLibFetchX(ae3f dice master)
-endif()
-
+# executable
 add_executable(dice
 	${dice_app}
 	${dice_inc}
-	${dice_lib}
-	)
+)
+
 ae2f_UltraErrWERROR(dice PRIVATE)
 
 target_link_libraries(dice ae3f::rolladie)
