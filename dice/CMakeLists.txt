@@ -42,3 +42,12 @@ ae2f_UltraErrWERROR(dice PRIVATE)
 
 target_link_libraries(dice ae3f::rolladie)
 target_include_directories(dice PRIVATE inc)
+
+add_executable(dice-tui-test
+	${CMAKE_CURRENT_SOURCE_DIR}/test/tui_test.c
+	)
+ae2f_UltraErrWERROR(dice-tui-test PRIVATE)
+
+target_include_directories(dice-tui-test PRIVATE app)
+
+add_test(NAME dice-tui-test COMMAND dice-tui-test)
