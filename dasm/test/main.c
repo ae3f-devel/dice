@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <libdice.h>
 
-#define  PROGRAMME 	"label0: nop		\n"	\
+#define  PROGRAMME0 	"label0: nop		\n"	\
 			"iadd 111 *111 #1	\n"	\
 			"igt 112 *111 #8	\n"	\
 			"puti *111 		\n"	\
 			"jmpz *112 #label0	\n"	\
 			"eop"
+
 
 			
 static E_LIBDICE_CTX_t	__putc(
@@ -64,7 +65,7 @@ int main(void)
 	libdice_word_t exe[DASM_PROGRAMME_MAX_LEN] = {0,};
 	libdice_word_t exe_cnt = 0;
 
-	char asm_programme[DASM_PROGRAMME_MAX_LEN] = PROGRAMME;
+	char asm_programme[DASM_PROGRAMME_MAX_LEN] = PROGRAMME0;
 	exe_cnt = dasm_assemble(exe, DASM_PROGRAMME_MAX_LEN, asm_programme, DASM_PROGRAMME_MAX_LEN);
 	if (exe_cnt == DASM_ERR_RET) {
 		printf("Syntax error\n");

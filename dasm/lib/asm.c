@@ -17,9 +17,11 @@ DICEIMPL libdice_word_t dasm_assemble(
 		)
 {
 	struct dasm_pp_ret pp_ret;
-	struct dasm_tok_ret tok_ret;
+	struct dasm_tok_status tok_status;
 	struct dasm_parser_ret parser_ret;
 	struct dasm_asm_ret asm_ret;
+
+	enum DASM_TOK_ERR_ tok_errcode;
 
 	char tmp_buf[DASM_PROGRAMME_MAX_LEN] = {0,};
 	libdice_word_t buf_cnt = 0;
@@ -42,9 +44,9 @@ DICEIMPL libdice_word_t dasm_assemble(
 		return DASM_ERR_RET;
 	}
 
-	tok_ret = dasm_tokenize_programme(tok_lines, DASM_PROGRAMME_MAX_LEN, tmp_buf, buf_cnt, &tok_line_cnt);
-	if (tok_ret.err != DASM_TOK_ERR_OK) {
-		printf("[ERROR] tok_ret.m_err = %u\n", tok_ret.err);
+	tok_errcode = dasm_tokenize_programme(tok_lines, DASM_PROGRAMME_MAX_LEN, tmp_buf, buf_cnt, &tok_line_cnt, &tok_status);
+	if (tok_errcode != DASM_TOK_ERR_OK) {
+		printf("[ERROR] tok_ret.m_err = %u\n", tok_errcode);
 		return DASM_ERR_RET;
 	}
 

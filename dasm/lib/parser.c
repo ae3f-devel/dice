@@ -221,8 +221,10 @@ static enum DASM_PARSER_ERR_ dasm_parse_operand(struct dasm_operand *rdwr_operan
 			/* label must be handled by  dasm_parse_line. This means the label was placed in the middle of the line, not at the beginning*/
 			return DASM_PARSER_ERR_INVAL_LABEL;
 		case DASM_TOK_TYPE_STRING:
-			/* Doesn't support string yet*/
-			return DASM_PARSER_ERR_UNKNOWN;
+			
+				
+			return DASM_PARSER_ERR_INVAL_STRING;
+			
 		case DASM_TOK_TYPE_ASCII:
 			{
 				int tmp = 0;
