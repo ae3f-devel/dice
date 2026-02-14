@@ -127,6 +127,17 @@ int main(void) {
 		LIBDICE_OPCODE_PUTC, 0, 'l',
 		LIBDICE_OPCODE_PUTC, 0, 'd',
 		LIBDICE_OPCODE_PUTC, 0, '\n',
+
+		/* DEF and UNDEF operation */
+		LIBDICE_OPCODE_DEF, 0, 0,
+		LIBDICE_OPCODE_UNDEF, 0, 0,
+
+		/* TIME and RAND operation */
+		LIBDICE_OPCODE_TIME, 16,
+		LIBDICE_OPCODE_RAND, 0, 16,
+		LIBDICE_OPCODE_PUTI, 1, 16,
+		LIBDICE_OPCODE_PUTC, 0, '\n',
+
 		/* End of program */
 		LIBDICE_OPCODE_EOP,
 	};
