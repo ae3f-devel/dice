@@ -1,37 +1,71 @@
-#ifndef libdasm_tokenizer_h
-#define libdasm_tokenizer_h
+#ifndef dasm_tokenizer_h
+#define dasm_tokenizer_h
 
 #include <libdice/type.h>
+#include <dasm.h>
 
-#define LIBDASM_TOKEN_MAX_LEN 64	
-#define LIBDASM_TOKEN_MAX_CNT_PER_LINE 12
+#define DASM_TOK_MAX_LEN 64	
+#define DASM_TOK_MAX_CNT_PER_LINE 12
 
-/* TODO : change name to enum LIBDASM_TOKEN_TYPE_ */
-enum LIBDASM_TOKEN_TYPE_ {
-	LIBDASM_TOKEN_TYPE_IDENT = 0,	/* opcode, jmp *label */	
-	LIBDASM_TOKEN_TYPE_NUMBER,	/* immediate value, address*/
-	LIBDASM_TOKEN_TYPE_LABEL,	/* label: */
-	LIBDASM_TOKEN_TYPE_STRING,	/* "string" */
-	LIBDASM_TOKEN_TYPE_CHAR,	/* 'char' */
-	LIBDASM_TOKEN_TYPE_OPERATOR,	/* asterisk*/
-	LIBDASM_TOKEN_TYPE_EOL,		/* '\n' */
-	LIBDASM_TOKEN_TYPE_EOP		/* '\0' */
+enum DASM_TOK_TYPE_ {
+	/** opcode, jmp *label */
+	DASM_TOK_TYPE_IDENT,	
+	/* immediate value, address*/
+	DASM_TOK_TYPE_NUMBER,	
+	/* label: */
+	DASM_TOK_TYPE_LABEL,	
+	/* "string" */
+	DASM_TOK_TYPE_STRING,	
+	/* 'A' */
+	DASM_TOK_TYPE_ASCII,
+	/* asterisk*/
+	DASM_TOK_TYPE_OPERATOR,
+	/* '\n' */
+	DASM_TOK_TYPE_EOL,
+	/* '\0' */
+	DASM_TOK_TYPE_EOP,
+	/**
+	 * @brief 
+	 * */
+	DASM_TOK_TYPE_UNKNOWN
 };
- 
 
-
-struct libdasm_token {
-	char m_text[LIBDASM_TOKEN_MAX_LEN];	/* TODO : change name to m_text*/
-	enum LIBDASM_TOKEN_TYPE_ m_token_type;
+enum DASM_TOK_ERR_ {
+	DASM_TOK_ERR_OK,
+	DASM_TOK_ERR_MEM_INSUF,
+	DASM_TOK_ERR_NO_TERM,
+	DASM_TOK_ERR_INVAL_CHAR,
+	DASM_TOK_ERR_INVAL_ASCII,
+	DASM_TOK_ERR_INVAL_STRING,
+	DASM_TOK_ERR_UNKNOWN
 };
 
-struct libdasm_token_line {
-	struct libdasm_token m_tokens[LIBDASM_TOKEN_MAX_CNT_PER_LINE];
-	libdice_word_t m_token_cnt;
+struct dasm_tok {
+	char m_text[DASM_TOK_MAX_LEN];
+	enum DASM_TOK_TYPE_ m_tok_type;
 };
 
-libdice_word_t libdasm_tokenize_programme(struct libdasm_token_line rdwr_token_lines[], const libdice_word_t c_token_lines_len, const char rd_src[], const libdice_word_t c_src_len);
-libdice_word_t libdasm_get_token_line_word_len(const struct libdasm_token_line *rd_token_line);
+struct dasm_tok_line {
+	struct dasm_tok *m_toks;
+	libdice_word_t m_toks_len;
+	libdice_word_t m_tok_cnt;
+};
+
+struct dasm_tok_status {
+	/** 
+	 * @brief Read line count without error line
+	 * */
+	libdice_word_t m_read_line_cnt;
+	/** 
+	 * @brief Read count without error character 
+	 * */
+	libdice_word_t m_read_char_cnt;
+	libdice_word_t m_write_tok_line_cnt;
+};
+
+DICECALL enum DASM_TOK_ERR_ dasm_tokenize_programme(struct dasm_tok_line rdwr_tok_lines[], const libdice_word_t c_dst_len,
+		const char rd_src[], const libdice_word_t c_src_len, struct dasm_tok_status *rdwr_status);
+DICECALL libdice_word_t dasm_get_tok_line_word_len(const struct dasm_tok_line *rd_tok_line);
 
 
-#endif /* libdasm_tokenizer_h */
+#endif /* dasm_tokenizer_h */
