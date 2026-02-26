@@ -1,5 +1,11 @@
 #include "dice/tui.h"
 
+#include <ae2f/Sys/Trm.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+
 #if ae2f_Sys_WIN(!)0
 #include <windows.h>
 #else
@@ -50,7 +56,7 @@ dice_tui_status_t dice_tui_init(void)
 
     dice_tui_ctx.m_front = stdout;
 
-    fprintf(dice_tui_ctx.m_front, "\x1b[2J\x1b[H");
+    _ae2fsys_clear_trm_simple_imp(L);
     fflush(dice_tui_ctx.m_front);
 
     size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
@@ -108,7 +114,8 @@ dice_tui_status_t dice_tui_render(void)
             size_t y = i / (size_t)dice_tui_ctx.m_width;
             size_t x = i % (size_t)dice_tui_ctx.m_width;
             
-            fprintf(dice_tui_ctx.m_front, "\x1b[%zu;%zuH%c", y + 1, x + 1, nb);
+            _ae2fsys_trm_goto_simple_imp(L, (int)(x + 1), (int)(y + 1));
+            fputc(nb, dice_tui_ctx.m_front);
 
             dice_tui_ctx.m_prev[i] = nb;
         }

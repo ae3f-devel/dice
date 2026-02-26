@@ -25,7 +25,7 @@ int main(void)
 	tcgetattr(STDIN_FILENO, &orig);
 
     raw = orig;
-    raw.c_lflag &= (tcflag_t)~(ECHO | ICANON);
+    raw.c_lflag &= (tcflag_t)(ECHO | ICANON);
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &raw);
 

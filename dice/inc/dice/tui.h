@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include "tui/err.h"
+#include "dice/tui/err.h"
 
 #if ae2f_Sys_WIN(!)0
 #include <windows.h>
@@ -30,4 +30,5 @@ dice_tui_status_t dice_tui_get_size(void);
 dice_tui_status_t dice_tui_init(void);
 dice_tui_status_t dice_tui_set_char(int x, int y, char c);
 dice_tui_status_t dice_tui_render(void);
+
 #endif
