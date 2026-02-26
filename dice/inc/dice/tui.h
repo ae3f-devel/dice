@@ -22,9 +22,9 @@ typedef struct {
     FILE* m_front;
     char* m_back;
     char* m_prev;
-} ctx_t;
+} dice_tui_ctx_t;
 
-extern ctx_t tui_ctx;
+extern dice_tui_ctx_t dice_tui_ctx;
 
 dice_tui_status_t dice_tui_get_size(void);
 dice_tui_status_t dice_tui_init(void);

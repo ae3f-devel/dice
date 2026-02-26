@@ -18,7 +18,7 @@ int main(void)
         dice_tui_set_char(start_x + i, start_y, msg[i]);
     }
 
-    tui_render();
+    dice_tui_render();
 
     struct termios orig, raw;
 
@@ -42,7 +42,7 @@ int main(void)
 
         xpos++;
 
-        if (xpos >= tui_ctx.m_width) {
+        if (xpos >= dice_tui_ctx.m_width) {
 		}
 	}
 

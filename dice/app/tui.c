@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-ctx_t dice_tui_ctx = {0};
+dice_tui_ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
 {
@@ -40,7 +40,7 @@ dice_tui_status_t dice_tui_init(void)
         return DICE_TUI_INIT_RECALL;
     }
 
-    if (tui_get_size() != DICE_TUI_OK){
+    if (dice_tui_get_size() != DICE_TUI_OK){
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
@@ -62,7 +62,7 @@ dice_tui_status_t dice_tui_init(void)
         free(dice_tui_ctx.m_back);
         free(dice_tui_ctx.m_prev);
 
-        return DICE_DICE_TUI_ERR_MEMORY_ALLOC;
+        return DICE_TUI_ERR_MEMORY_ALLOC;
     }
     
     memset(dice_tui_ctx.m_back, ' ', total);
