@@ -10,25 +10,12 @@ dice_tui_ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
 {
-#if ae2f_Sys_WIN(!)0
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    _ae2fsys_get_trm_size_simple_imp(L,dice_tui_ctx.m_width,dice_tui_ctx.m_height);
 
-    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)){
+    if (dice_tui_ctx.m_width == 0 || dice_tui_ctx.m_height == 0) {
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
-    dice_tui_ctx.m_width  = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    dice_tui_ctx.m_height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-#else
-    struct winsize w;
-
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1){
-        return DICE_TUI_ERR_WINDOW_SIZE;
-    }
-
-    dice_tui_ctx.m_width  = w.ws_col;
-    dice_tui_ctx.m_height = w.ws_row;
-#endif
     return DICE_TUI_OK;
 }
 
