@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "tui.h"
 
+int main(void);
 int main(void)
 {
     if (tui_init() != TUI_OK){
@@ -38,7 +39,7 @@ int main(void)
 
         tui_set_char(xpos, ypos, (char)ch);
         tui_render();
-		
+
         xpos++;
 
         if (xpos >= tui_ctx.width) {
