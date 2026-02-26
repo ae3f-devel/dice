@@ -10,7 +10,7 @@
 
 ctx_t tui_ctx = {0};
 
-tui_status_t dice_tui_get_size(void)
+dice_tui_status_t dice_tui_get_size(void)
 {
 #if ae2f_Sys_WIN(!)0
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -34,7 +34,7 @@ tui_status_t dice_tui_get_size(void)
     return DICE_TUI_OK;
 }
 
-tui_status_t dice_tui_init(void)
+dice_tui_status_t dice_tui_init(void)
 {
     if (tui_ctx.m_front){
         return DICE_TUI_INIT_RECALL;
@@ -72,7 +72,7 @@ tui_status_t dice_tui_init(void)
 }
 
 
-tui_status_t dice_tui_set_char(int x, int y, char c)
+dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 {
     if (!tui_ctx.m_back){
         return DICE_TUI_ERR_NULL_POINTER;
@@ -93,7 +93,7 @@ tui_status_t dice_tui_set_char(int x, int y, char c)
 }
 
 
-tui_status_t dice_tui_render(void)
+dice_tui_status_t dice_tui_render(void)
 {
     if (!tui_ctx.m_back || !tui_ctx.m_prev){
         return DICE_TUI_ERR_NULL_POINTER;

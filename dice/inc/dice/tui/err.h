@@ -9,5 +9,5 @@ typedef enum DICE_TUI_ {
     DICE_TUI_ERR_OUT_OF_BOUNDS,
     DICE_TUI_ERR_INVALID_INPUT,
     DICE_TUI_ERR_WINDOW_SIZE,
-} tui_status_t;
+} dice_tui_status_t;
 #endif

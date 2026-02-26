@@ -4,7 +4,7 @@
 int main(void);
 int main(void)
 {
-    if (dice_tui_init() != TUI_OK){
+    if (dice_tui_init() != DICE_TUI_OK){
 		fprintf(stderr, "failed to initialize TUI\n");
 		return 1;
 	}
