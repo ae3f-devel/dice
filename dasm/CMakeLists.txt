@@ -25,6 +25,7 @@ endif()
 cmake_minimum_required(VERSION 3.10)
 project(libdice VERSION 0)
 
+
 file(GLOB_RECURSE asmdice_c ${CMAKE_CURRENT_SOURCE_DIR}/lib/*)
 file(GLOB_RECURSE asmdice_h ${CMAKE_CURRENT_SOURCE_DIR}/inc/*)
 

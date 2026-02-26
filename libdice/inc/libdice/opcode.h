@@ -4,7 +4,7 @@
 #define libdice_opcode_h
 
 #define LIBDICE_OPERAND_MAX_CNT 5
-#define LIBDICE_OPCODE_CNT 56
+#define LIBDICE_OPCODE_CNT 53
 /**
  *
  * */

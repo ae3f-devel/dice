@@ -1,75 +1,76 @@
-#ifndef	dasm_keys_h
-#define	dasm_keys_h
+#ifndef dasm_keys_h
+#define dasm_keys_h
 
+#define DASM_MNEMONIC_CNT     53
 
-#define LIBDASM_OPCODE_TXT_NOP        "nop"
-#define LIBDASM_OPCODE_TXT_IADD       "iadd"
-#define LIBDASM_OPCODE_TXT_ISUB       "isub"
-#define LIBDASM_OPCODE_TXT_IMUL       "imul"
-#define LIBDASM_OPCODE_TXT_IDIV       "idiv"
-#define LIBDASM_OPCODE_TXT_IREM       "irem"
-#define LIBDASM_OPCODE_TXT_UMUL       "umul"
-#define LIBDASM_OPCODE_TXT_UDIV       "udiv"
-#define LIBDASM_OPCODE_TXT_UREM       "urem"
+#define DASM_MNEMONIC_NOP        "nop"
 
-#define LIBDASM_OPCODE_TXT_FADD       "fadd"
-#define LIBDASM_OPCODE_TXT_FSUB       "fsub"
-#define LIBDASM_OPCODE_TXT_FMUL       "fmul"
-#define LIBDASM_OPCODE_TXT_FDIV       "fdiv"
+#define DASM_MNEMONIC_IADD       "iadd"
+#define DASM_MNEMONIC_ISUB       "isub"
+#define DASM_MNEMONIC_IMUL       "imul"
+#define DASM_MNEMONIC_IDIV       "idiv"
+#define DASM_MNEMONIC_IREM       "irem"
+#define DASM_MNEMONIC_UMUL       "umul"
+#define DASM_MNEMONIC_UDIV       "udiv"
+#define DASM_MNEMONIC_UREM       "urem"
 
-#define LIBDASM_OPCODE_TXT_INEG       "ineg"
-#define LIBDASM_OPCODE_TXT_FNEG       "fneg"
+#define DASM_MNEMONIC_FADD       "fadd"
+#define DASM_MNEMONIC_FSUB       "fsub"
+#define DASM_MNEMONIC_FMUL       "fmul"
+#define DASM_MNEMONIC_FDIV       "fdiv"
 
-#define LIBDASM_OPCODE_TXT_JMP        "jmp"
-#define LIBDASM_OPCODE_TXT_JMPA       "jmpa"
-#define LIBDASM_OPCODE_TXT_JMPN       "jmpn"
+#define DASM_MNEMONIC_INEG       "ineg"
+#define DASM_MNEMONIC_FNEG       "fneg"
 
-#define LIBDASM_OPCODE_TXT_JMPZ       "jmpz"
-#define LIBDASM_OPCODE_TXT_JMPZA      "jmpza"
-#define LIBDASM_OPCODE_TXT_JMPZN      "jmpzn"
+#define DASM_MNEMONIC_JMP        "jmp"
+#define DASM_MNEMONIC_JMPA       "jmpa"
+#define DASM_MNEMONIC_JMPN       "jmpn"
 
-#define LIBDASM_OPCODE_TXT_BAND       "band"
-#define LIBDASM_OPCODE_TXT_BOR        "bor"
-#define LIBDASM_OPCODE_TXT_BXOR       "bxor"
-#define LIBDASM_OPCODE_TXT_BLSHIFT    "blshift"
-#define LIBDASM_OPCODE_TXT_BRSHIFT    "brshift"
-#define LIBDASM_OPCODE_TXT_LRSHIFT    "lrshift"
-#define LIBDASM_OPCODE_TXT_BNOT       "bnot"
+#define DASM_MNEMONIC_JMPZ       "jmpz"
+#define DASM_MNEMONIC_JMPZA      "jmpza"
+#define DASM_MNEMONIC_JMPZN      "jmpzn"
 
-#define LIBDASM_OPCODE_TXT_LAND       "land"
-#define LIBDASM_OPCODE_TXT_LOR        "lor"
-#define LIBDASM_OPCODE_TXT_LNOT       "lnot"
+#define DASM_MNEMONIC_BAND       "band"
+#define DASM_MNEMONIC_BOR        "bor"
+#define DASM_MNEMONIC_BXOR       "bxor"
+#define DASM_MNEMONIC_BLSHIFT    "blshift"
+#define DASM_MNEMONIC_BRSHIFT    "brshift"
+#define DASM_MNEMONIC_LRSHIFT    "lrshift"
+#define DASM_MNEMONIC_BNOT       "bnot"
 
-#define LIBDASM_OPCODE_TXT_TOBIT      "tobit"
+#define DASM_MNEMONIC_LAND       "land"
+#define DASM_MNEMONIC_LOR        "lor"
+#define DASM_MNEMONIC_LNOT       "lnot"
 
-#define LIBDASM_OPCODE_TXT_EQ         "eq"
-#define LIBDASM_OPCODE_TXT_NEQ        "neq"
+#define DASM_MNEMONIC_TOBIT      "tobit"
 
-#define LIBDASM_OPCODE_TXT_SET        "set"
-#define LIBDASM_OPCODE_TXT_MSET       "mset"
-#define LIBDASM_OPCODE_TXT_MOV        "mov"
+#define DASM_MNEMONIC_EQ         "eq"
+#define DASM_MNEMONIC_NEQ        "neq"
 
-#define LIBDASM_OPCODE_TXT_ITOF       "itof"
-#define LIBDASM_OPCODE_TXT_FTOI       "ftoi"
+#define DASM_MNEMONIC_SET        "set"
+#define DASM_MNEMONIC_MSET       "mset"
+#define DASM_MNEMONIC_MOV        "mov"
 
-#define LIBDASM_OPCODE_TXT_IGT        "igt"
-#define LIBDASM_OPCODE_TXT_FGT        "fgt"
-#define LIBDASM_OPCODE_TXT_ILT        "ilt"
-#define LIBDASM_OPCODE_TXT_FLT        "flt"
+#define DASM_MNEMONIC_ITOF       "itof"
+#define DASM_MNEMONIC_FTOI       "ftoi"
 
-#define LIBDASM_OPCODE_TXT_PUTS       "puts"
-#define LIBDASM_OPCODE_TXT_PUTI       "puti"
-#define LIBDASM_OPCODE_TXT_PUTU       "putu"
-#define LIBDASM_OPCODE_TXT_PUTC       "putc"
-#define LIBDASM_OPCODE_TXT_PUTF       "putf"
+#define DASM_MNEMONIC_IGT        "igt"
+#define DASM_MNEMONIC_FGT        "fgt"
+#define DASM_MNEMONIC_ILT        "ilt"
+#define DASM_MNEMONIC_FLT        "flt"
 
-#define LIBDASM_OPCODE_TXT_DEF        "def"
-#define LIBDASM_OPCODE_TXT_UNDEF      "undef"
+#define DASM_MNEMONIC_PUTS       "puts"
+#define DASM_MNEMONIC_PUTI       "puti"
+#define DASM_MNEMONIC_PUTU       "putu"
+#define DASM_MNEMONIC_PUTC       "putc"
+#define DASM_MNEMONIC_PUTF       "putf"
 
-#define LIBDASM_OPCODE_TXT_SETRANDSEED "setrandseed"
-#define LIBDASM_OPCODE_TXT_IRAND      "irand"
-#define LIBDASM_OPCODE_TXT_FRAND      "frand"
+#define DASM_MNEMONIC_DEF        "def"
+#define DASM_MNEMONIC_UNDEF      "undef"
 
-#define LIBDASM_OPCODE_TXT_EOP        "eop"
+#define DASM_MNEMONIC_RAND       "rand"
+#define DASM_MNEMONIC_TIME       "time"
+
+#define DASM_MNEMONIC_EOP        "eop"
 
 #endif
