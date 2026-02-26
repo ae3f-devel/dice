@@ -24,7 +24,7 @@ typedef struct {
     char* prev;
 } ctx_t;
 
-static ctx_t tui_ctx = {0};
+ctx_t tui_ctx = {0};
 
 static ae2f_inline tui_status_t tui_get_size(void)
 {

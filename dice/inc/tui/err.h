@@ -1,7 +1,7 @@
 #ifndef TUI_ERR_H
 #define TUI_ERR_H
 
-typedef enum TUI_ {
+typedef enum DICE_TUI_ {
     TUI_OK = 0,
     TUI_INIT_RECALL,
     TUI_ERR_MEMORY_ALLOC,
