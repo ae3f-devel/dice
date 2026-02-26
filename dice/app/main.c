@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "dice/tui.h"
 
 #if ae2f_Sys_WIN(!)0
@@ -33,7 +34,7 @@ int main(void)
 	tcgetattr(STDIN_FILENO, &orig);
 
     raw = orig;
-    raw.c_lflag &= (tcflag_t)(ECHO | ICANON);
+    raw.c_lflag &= (tcflag_t)~(ECHO | ICANON);
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &raw);
 
