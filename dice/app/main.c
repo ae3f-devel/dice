@@ -8,11 +8,11 @@ int main(void)
 		fprintf(stderr, "failed to initialize TUI\n");
 		return 1;
 	}
-	
+
 	const char *msg = "Hello, world!";
 
-    int start_x = ((int)tui_ctx.m_width - (int)strlen(msg)) / 2;
-    int start_y = ((int)tui_ctx.m_height) / 2;
+    int start_x = ((int)dice_tui_ctx.m_width - (int)strlen(msg)) / 2;
+    int start_y = ((int)dice_tui_ctx.m_height) / 2;
 
     for (int i = 0; msg[i]; ++i) {
         dice_tui_set_char(start_x + i, start_y, msg[i]);

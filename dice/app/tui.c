@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-ctx_t tui_ctx = {0};
+ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
 {
@@ -19,8 +19,8 @@ dice_tui_status_t dice_tui_get_size(void)
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
-    tui_ctx.m_width  = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    tui_ctx.m_height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    dice_tui_ctx.m_width  = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    dice_tui_ctx.m_height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 #else
     struct winsize w;
 
@@ -28,15 +28,15 @@ dice_tui_status_t dice_tui_get_size(void)
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
-    tui_ctx.m_width  = w.ws_col;
-    tui_ctx.m_height = w.ws_row;
+    dice_tui_ctx.m_width  = w.ws_col;
+    dice_tui_ctx.m_height = w.ws_row;
 #endif
     return DICE_TUI_OK;
 }
 
 dice_tui_status_t dice_tui_init(void)
 {
-    if (tui_ctx.m_front){
+    if (dice_tui_ctx.m_front){
         return DICE_TUI_INIT_RECALL;
     }
 
@@ -44,29 +44,29 @@ dice_tui_status_t dice_tui_init(void)
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
-    if (tui_ctx.m_width == 0 || tui_ctx.m_height == 0){
+    if (dice_tui_ctx.m_width == 0 || dice_tui_ctx.m_height == 0){
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
-    tui_ctx.m_front = stdout;
+    dice_tui_ctx.m_front = stdout;
 
-    fprintf(tui_ctx.m_front, "\x1b[2J\x1b[H");
-    fflush(tui_ctx.m_front);
+    fprintf(dice_tui_ctx.m_front, "\x1b[2J\x1b[H");
+    fflush(dice_tui_ctx.m_front);
 
-    size_t total = (size_t)tui_ctx.m_width * (size_t)tui_ctx.m_height;
+    size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
 
-    tui_ctx.m_back  = malloc(total);
-    tui_ctx.m_prev  = malloc(total);
+    dice_tui_ctx.m_back  = malloc(total);
+    dice_tui_ctx.m_prev  = malloc(total);
 
-    if (!tui_ctx.m_back || !tui_ctx.m_prev){
-        free(tui_ctx.m_back);
-        free(tui_ctx.m_prev);
+    if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev){
+        free(dice_tui_ctx.m_back);
+        free(dice_tui_ctx.m_prev);
 
         return DICE_DICE_TUI_ERR_MEMORY_ALLOC;
     }
     
-    memset(tui_ctx.m_back, ' ', total);
-    memset(tui_ctx.m_prev, ' ', total);
+    memset(dice_tui_ctx.m_back, ' ', total);
+    memset(dice_tui_ctx.m_prev, ' ', total);
 
     return DICE_TUI_OK;
 }
@@ -74,7 +74,7 @@ dice_tui_status_t dice_tui_init(void)
 
 dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 {
-    if (!tui_ctx.m_back){
+    if (!dice_tui_ctx.m_back){
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
@@ -82,12 +82,12 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
         return DICE_TUI_ERR_INVALID_INPUT;
     }
 
-    if ((ae2fsys_trmpos_t)x >= tui_ctx.m_width || (ae2fsys_trmpos_t)y >= tui_ctx.m_height){
+    if ((ae2fsys_trmpos_t)x >= dice_tui_ctx.m_width || (ae2fsys_trmpos_t)y >= dice_tui_ctx.m_height){
         return DICE_TUI_ERR_OUT_OF_BOUNDS;
     }
 
-    size_t idx = (size_t)y * (size_t)tui_ctx.m_width + (size_t)x;
-    tui_ctx.m_back[idx] = c;
+    size_t idx = (size_t)y * (size_t)dice_tui_ctx.m_width + (size_t)x;
+    dice_tui_ctx.m_back[idx] = c;
 
     return DICE_TUI_OK;
 }
@@ -95,26 +95,26 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 
 dice_tui_status_t dice_tui_render(void)
 {
-    if (!tui_ctx.m_back || !tui_ctx.m_prev){
+    if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev){
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
-    size_t total = (size_t)tui_ctx.m_width * (size_t)tui_ctx.m_height;
+    size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
 
     for (size_t i = 0; i < total; ++i) {
-        char nb = tui_ctx.m_back[i];
+        char nb = dice_tui_ctx.m_back[i];
 
-        if (nb != tui_ctx.m_prev[i]) {
-            size_t y = i / (size_t)tui_ctx.m_width;
-            size_t x = i % (size_t)tui_ctx.m_width;
+        if (nb != dice_tui_ctx.m_prev[i]) {
+            size_t y = i / (size_t)dice_tui_ctx.m_width;
+            size_t x = i % (size_t)dice_tui_ctx.m_width;
             
-            fprintf(tui_ctx.m_front, "\x1b[%zu;%zuH%c", y + 1, x + 1, nb);
+            fprintf(dice_tui_ctx.m_front, "\x1b[%zu;%zuH%c", y + 1, x + 1, nb);
 
-            tui_ctx.m_prev[i] = nb;
+            dice_tui_ctx.m_prev[i] = nb;
         }
     }
 
-    fflush(tui_ctx.m_front);
+    fflush(dice_tui_ctx.m_front);
 
     return DICE_TUI_OK;
 }
