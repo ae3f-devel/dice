@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include "dice/tui.h"
 
+#if ae2f_Sys_WIN(!)0
+#include <windows.h>
+#else
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
+
 int main(void);
 int main(void)
 {

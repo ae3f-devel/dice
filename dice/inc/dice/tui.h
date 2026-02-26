@@ -8,14 +8,6 @@
 #include <stddef.h>
 #include "dice/tui/err.h"
 
-#if ae2f_Sys_WIN(!)0
-#include <windows.h>
-#else
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#endif
-
 typedef struct {
     ae2fsys_trmpos_t m_width;
     ae2fsys_trmpos_t m_height;
