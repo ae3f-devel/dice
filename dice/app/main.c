@@ -50,5 +50,5 @@ int main(void)
     tcsetattr(STDIN_FILENO, TCSANOW, &orig);
 	printf("\nbye\n");
 	
-	return 0;슨
+	return 0;
 }
