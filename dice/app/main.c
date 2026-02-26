@@ -4,7 +4,7 @@
 int main(void);
 int main(void)
 {
-    if (tui_init() != TUI_OK){
+    if (dice_tui_init() != TUI_OK){
 		fprintf(stderr, "failed to initialize TUI\n");
 		return 1;
 	}
@@ -15,7 +15,7 @@ int main(void)
     int start_y = ((int)tui_ctx.m_height) / 2;
 
     for (int i = 0; msg[i]; ++i) {
-        tui_set_char(start_x + i, start_y, msg[i]);
+        dice_tui_set_char(start_x + i, start_y, msg[i]);
     }
 
     tui_render();
@@ -37,8 +37,8 @@ int main(void)
 			continue;
 		}
 
-        tui_set_char(xpos, ypos, (char)ch);
-        tui_render();
+        dice_tui_set_char(xpos, ypos, (char)ch);
+        dice_tui_render();
 
         xpos++;
 
