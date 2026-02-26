@@ -43,11 +43,12 @@ int main(void)
         xpos++;
 
         if (xpos >= dice_tui_ctx.m_width) {
+            return -1;
 		}
 	}
 
     tcsetattr(STDIN_FILENO, TCSANOW, &orig);
 	printf("\nbye\n");
 	
-	return 0;
+	return 0;슨
 }
