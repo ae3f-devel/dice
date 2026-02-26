@@ -1,6 +1,7 @@
 #include <ae2f/cc.h>
 #include "pp.h"
 #include "dasm/err.h"
+#include <stdlib.h>
 
 DICEIMPL bool dasm_pp_init(struct dasm_pp *rdwr_pp, 
 	char rdwr_dst[], const libdice_word_t c_dst_len,

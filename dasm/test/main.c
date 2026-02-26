@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #define PROGRAMME	"iadd 1000 10, 10 	   \r\n"	\
-			"    } \"	dsdsf 	 \"   \n"	\
+			"     \"	dsdsf 	 \"   \n"	\
 			"      		\'aa\'\'   		\n"		
 
 

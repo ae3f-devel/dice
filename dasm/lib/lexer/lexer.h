@@ -4,7 +4,6 @@
 #ifndef dasm_lexer_h
 #define dasm_lexer_h
 
-#include <stdlib.h>
 #include <ae2f/c90/StdBool.h>
 #include <dasm/err.h>
 #include <libdice/abi.h>
@@ -30,10 +29,28 @@ struct dasm_lexer {
 	enum DASM_LEXER_STATE_ m_state;
 };
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_lexer 
+ * @param rdwr_toks 
+ * @param c_tokens_len 
+ * @param rd_src 
+ * @param c_src_len 
+ * @return bool Returns true on success and false on failure.
+ */
 DICECALL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer,
 	struct dasm_tok rdwr_toks[], const libdice_word_t c_tokens_len,
 	const char rd_src[], const libdice_word_t c_src_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_lexer 
+ * @return bool Returns true on success and false on failure.
+ */
 DICECALL bool dasm_lexer_deinit(struct dasm_lexer *rdwr_lexer);
+
 DICECALL enum DASM_ERR_ dasm_lexer_execute(struct dasm_lexer *rdwr_lexer);
 
 #endif /* dasm_lexer_h */

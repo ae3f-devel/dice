@@ -15,7 +15,6 @@
 #ifndef dasm_pp_h
 #define dasm_pp_h
 
-#include <stdlib.h>
 #include <ae2f/c90/StdBool.h>
 #include <dasm/err.h>
 #include <libdice/abi.h>
@@ -40,13 +39,49 @@ struct dasm_pp {
 	enum DASM_PP_STATE_ m_state;
 };
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_pp 
+ * @param rdwr_dst 
+ * @param c_dst_len 
+ * @param rd_src 
+ * @param c_src_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_pp_init(struct dasm_pp *rdwr_pp, 
 	char rdwr_dst[], const libdice_word_t c_dst_len, 
 	const char rd_src[], const libdice_word_t c_src_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_pp 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_pp_deinit(struct dasm_pp *rdwr_pp);
+
 DICECALL enum DASM_ERR_ dasm_pp_execute(struct dasm_pp *rdwr_pp);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_pp 
+ * @param rdwr_dst_opt 
+ * @param c_dst_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_pp_reset_dst(struct dasm_pp *rdwr_pp, 
 	char rdwr_dst_opt[], const libdice_word_t c_dst_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_pp 
+ * @param rd_src_opt 
+ * @param c_src_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_pp_reset_src(struct dasm_pp *rdwr_pp, 
 	const char rd_src_opt[], const libdice_word_t c_src_len);
 

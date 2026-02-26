@@ -1,6 +1,6 @@
 #include "toks.h"
 #include <stddef.h>
-
+#include <stdlib.h>
 
 DICEIMPL bool dasm_tok_stream_seek(struct dasm_tok_stream *rdwr_tstream, 
 	const ptrdiff_t c_offset, const enum DASM_TOK_STREAM_WHENCE_ c_whence)

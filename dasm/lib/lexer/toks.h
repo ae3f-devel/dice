@@ -4,7 +4,6 @@
 #ifndef dasm_toks_h
 #define dasm_toks_h
 
-#include <stdlib.h>
 #include <ae2f/c90/StdBool.h>
 #include <dasm/err.h>
 #include <libdice/abi.h>
@@ -41,23 +40,92 @@ struct dasm_tok_stream {
     libdice_word_t m_whence;
 };
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param c_offset 
+ * @param c_whence 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_seek(struct dasm_tok_stream *rdwr_tstream, 
 	const long c_offset, const enum DASM_TOK_STREAM_WHENCE_ c_whence);
+
 DICECALL struct dasm_tok* dasm_tok_stream_peek(struct dasm_tok_stream *rdwr_tstream);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_advance(struct dasm_tok_stream *rdwr_tstream);
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param rdwr_toks 
+ * @param c_toks_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_init(struct dasm_tok_stream *rdwr_tstream, 
 	struct dasm_tok rdwr_toks[], const libdice_word_t c_toks_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_deinit(struct dasm_tok_stream *rdwr_tstream);
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_append(struct dasm_tok_stream *rdwr_tstream);
 
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param c_tok_type 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_set_type(struct dasm_tok_stream *rdwr_tstream, 
 	const enum DASM_TOK_TYPE_ c_tok_type);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param rd_lexeme 
+ * @param c_lexeme_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_set_lexeme(struct dasm_tok_stream *rdwr_tstream, 
 	const char *rd_lexeme, const libdice_word_t c_lexeme_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param c_lexeme_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_set_lexeme_len(struct dasm_tok_stream *rdwr_tstream, 
 	const libdice_word_t c_lexeme_len);
+
+/**
+ * @brief 
+ * 
+ * @param rdwr_tstream 
+ * @param c_add_len 
+ * @return bool Returns true on success and false on failure. 
+ */
 DICECALL bool dasm_tok_stream_increase_lexeme_len(struct dasm_tok_stream *rdwr_tstream, 
 	const libdice_word_t c_add_len);
 	

@@ -5,13 +5,13 @@
 #include "toks.h"
 #include <string.h>
 #include <dasm/keys.h>
+#include <stdlib.h>
 
-struct dasm_tok_mnemonic {
+static struct {
 	const char *m_str;
 	libdice_word_t m_str_len;
-};
 
-static struct dasm_tok_mnemonic s_mnemonics[DASM_MNEMONIC_CNT] = {
+} s_mnemonics[DASM_MNEMONIC_CNT] = {
 	{ DASM_MNEMONIC_NOP,     sizeof(DASM_MNEMONIC_NOP) - 1},
 
 	{ DASM_MNEMONIC_IADD,    sizeof(DASM_MNEMONIC_IADD) - 1},
