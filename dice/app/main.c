@@ -79,6 +79,9 @@ int main(void)
             case 77:  if (xpos + 1 < dice_tui_ctx.m_width) xpos++; break;
             default: break;
             }
+            /* move physical terminal cursor to new location */
+            _ae2fsys_trm_goto_simple_imp(L, (int)(xpos + 1), (int)(ypos + 1));
+            fflush(dice_tui_ctx.m_front);
             continue;
         }
 #else
@@ -95,9 +98,21 @@ int main(void)
                 default: break;
                 }
             }
+            _ae2fsys_trm_goto_simple_imp(L, (int)(xpos + 1), (int)(ypos + 1));
+            fflush(dice_tui_ctx.m_front);
             continue;
         }
 #endif
+        /* handle backspace/delete keys */
+        if (ch == 8 || ch == 127) {
+            if (xpos > 0) {
+                xpos--;
+                dice_tui_set_char(xpos, ypos, ' ');
+                dice_tui_render();
+            }
+            continue;
+        }
+
         if (ch == 'q'){
             break;
         }
