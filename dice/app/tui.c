@@ -6,14 +6,6 @@
 #include <string.h>
 #include <stddef.h>
 
-#if ae2f_Sys_WIN(!)0
-#include <windows.h>
-#else
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#endif
-
 dice_tui_ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
