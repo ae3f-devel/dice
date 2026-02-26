@@ -11,8 +11,8 @@ int main(void)
 	
 	const char *msg = "Hello, world!";
 
-    int start_x = ((int)tui_ctx.width - (int)strlen(msg)) / 2;
-    int start_y = ((int)tui_ctx.height) / 2;
+    int start_x = ((int)tui_ctx.m_width - (int)strlen(msg)) / 2;
+    int start_y = ((int)tui_ctx.m_height) / 2;
 
     for (int i = 0; msg[i]; ++i) {
         tui_set_char(start_x + i, start_y, msg[i]);
@@ -42,7 +42,7 @@ int main(void)
 
         xpos++;
 
-        if (xpos >= tui_ctx.width) {
+        if (xpos >= tui_ctx.m_width) {
 		}
 	}
 

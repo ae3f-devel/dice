@@ -1,5 +1,5 @@
-#ifndef TUI_ERR_H
-#define TUI_ERR_H
+#ifndef dice_tui_err_h
+#define dice_tui_err_h
 
 typedef enum DICE_TUI_ {
     TUI_OK = 0,
