@@ -7,8 +7,8 @@
 #include <assert.h>
 
 #define PROGRAMME	"iadd 1000 10, 10 	   \r\n"	\
-			" }    \"	dsdsf 	 \"   \n"	\
-			"      		   		\n"		
+			"    } \"	dsdsf 	 \"   \n"	\
+			"      		\'aa\'\'   		\n"		
 
 
 int main(void)
@@ -24,7 +24,7 @@ int main(void)
 	char dst[100] = {0,};
 	struct dasm_tok toks[100] = {0,};
 	
-	dasm_pp_init(&pp, dst, 100, src, strlen(src)+1);
+	dasm_pp_init(&pp, dst, 3, src, strlen(src)+1);
 	printf("err = %u\n", dasm_pp_execute(&pp));
 	dasm_pp_reset_dst(&pp, NULL, 100);
 	printf("err = %u\n", dasm_pp_execute(&pp));

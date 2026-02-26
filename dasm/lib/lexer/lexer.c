@@ -146,6 +146,8 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 	char ch;
 	const char *lexeme = NULL;
 
+	libdice_word_t char_verification_cnt = 0;
+
 	if (!rdwr_lexer || !rdwr_lexer->m_src) {
 		return DASM_ERR_UNKNOWN;
 	}
@@ -162,6 +164,8 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 			if (ch == ' ') {
 				rdwr_lexer->m_src_cnt++;
 			} else if (ch == '\'') {
+
+				char_verification_cnt = 0;
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_CHAR_IMM;
 
@@ -276,7 +280,9 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 			switch (ch) {
 			case '\'':
-
+				if (char_verification_cnt != 1) {
+					return DASM_ERR_INVAL_CHAR_IMM;
+				}
 				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
@@ -286,6 +292,8 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 			case '\0':
 				return DASM_ERR_INVAL_CHAR_IMM;
 			default:
+				char_verification_cnt++;
+
 				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				break;
