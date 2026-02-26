@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stddef.h>
 
-dice_tui_ctx_t dice_tui_ctx = {0};
+ dice_tui_ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
 {
@@ -21,6 +21,8 @@ dice_tui_status_t dice_tui_get_size(void)
 
 dice_tui_status_t dice_tui_init(void)
 {
+    size_t total;
+
     if (dice_tui_ctx.m_front){
         return DICE_TUI_INIT_RECALL;
     }
@@ -38,7 +40,7 @@ dice_tui_status_t dice_tui_init(void)
     _ae2fsys_clear_trm_simple_imp(L);
     fflush(dice_tui_ctx.m_front);
 
-    size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
+    total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
 
     dice_tui_ctx.m_back  = malloc(total);
     dice_tui_ctx.m_prev  = malloc(total);
@@ -59,6 +61,8 @@ dice_tui_status_t dice_tui_init(void)
 
 dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 {
+    size_t idx;
+
     if (!dice_tui_ctx.m_back){
         return DICE_TUI_ERR_NULL_POINTER;
     }
@@ -71,7 +75,7 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
         return DICE_TUI_ERR_OUT_OF_BOUNDS;
     }
 
-    size_t idx = (size_t)y * (size_t)dice_tui_ctx.m_width + (size_t)x;
+    idx = (size_t)y * (size_t)dice_tui_ctx.m_width + (size_t)x;
     dice_tui_ctx.m_back[idx] = c;
 
     return DICE_TUI_OK;
@@ -80,13 +84,16 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 
 dice_tui_status_t dice_tui_render(void)
 {
+    size_t total;
+    size_t i;
+
     if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev){
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
-    size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
+    total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
 
-    for (size_t i = 0; i < total; ++i) {
+    for (i = 0; i < total; ++i) {
         char nb = dice_tui_ctx.m_back[i];
 
         if (nb != dice_tui_ctx.m_prev[i]) {

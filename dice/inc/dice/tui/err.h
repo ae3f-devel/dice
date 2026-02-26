@@ -8,6 +8,6 @@ typedef enum DICE_TUI_ {
     DICE_TUI_ERR_NULL_POINTER,
     DICE_TUI_ERR_OUT_OF_BOUNDS,
     DICE_TUI_ERR_INVALID_INPUT,
-    DICE_TUI_ERR_WINDOW_SIZE,
+    DICE_TUI_ERR_WINDOW_SIZE
 } dice_tui_status_t;
 #endif
