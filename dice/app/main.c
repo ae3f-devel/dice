@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "tui.h"
+#include "dice/tui.h"
 
 int main(void);
 int main(void)

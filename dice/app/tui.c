@@ -1,4 +1,4 @@
-#include "tui.h"
+#include "dice/tui.h"
 
 #if ae2f_Sys_WIN(!)0
 #include <windows.h>
