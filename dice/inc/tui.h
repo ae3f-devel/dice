@@ -26,8 +26,8 @@ typedef struct {
 
 extern ctx_t tui_ctx;
 
-tui_status_t tui_get_size(void);
-tui_status_t tui_init(void);
-tui_status_t tui_set_char(int x, int y, char c);
-tui_status_t tui_render(void);
+tui_status_t dice_tui_get_size(void);
+tui_status_t dice_tui_init(void);
+tui_status_t dice_tui_set_char(int x, int y, char c);
+tui_status_t dice_tui_render(void);
 #endif
