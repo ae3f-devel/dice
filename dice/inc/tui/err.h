@@ -1,0 +1,14 @@
+#ifndef TUI_ERR_H
+#define TUI_ERR_H
+
+typedef enum TUI_ {
+    TUI_OK = 0,
+    TUI_INIT_RECALL,
+    TUI_ERR_MEMORY_ALLOC,
+    TUI_ERR_NULL_POINTER,
+    TUI_ERR_OUT_OF_BOUNDS,
+    TUI_ERR_INVALID_INPUT,
+    TUI_ERR_WINDOW_SIZE,
+    TUI_ERR_OVERFLOW,
+} tui_status_t;
+#endif
