@@ -67,7 +67,7 @@ dice_tui_status_t dice_tui_init(void)
 }
 
 
-dice_tui_status_t dice_tui_set_char(int x, int y, char c)
+ae2f_inline dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 {
     size_t idx;
 
@@ -89,26 +89,21 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
     return DICE_TUI_OK;
 }
 
-dice_tui_status_t dice_tui_render(void)
+ae2f_inline dice_tui_status_t dice_tui_render(void)
 {
     const size_t width  = (size_t)dice_tui_ctx.m_width;
     const size_t height = (size_t)dice_tui_ctx.m_height;
-    size_t i, total;
+    size_t i;
 
     ae2f_unexpected_but_if(!dice_tui_ctx.m_front || !dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
-    total = width * height;
-
-    for (i = 0; i < total; ++i) {
+    for (i = 0; i < width * height; ++i) {
         char nb = dice_tui_ctx.m_back[i];
 
         if (nb != dice_tui_ctx.m_prev[i]) {
-            size_t y = i / width;
-            size_t x = i % width;
-            
-            _ae2fsys_trm_goto_simple_imp(L, (ae2fsys_trmpos_t)(x + 1), (ae2fsys_trmpos_t)(y + 1));
+            _ae2fsys_trm_goto_simple_imp(L, (ae2fsys_trmpos_t)(i % width + 1), (ae2fsys_trmpos_t)(i / width + 1));
 
             fputc(nb, dice_tui_ctx.m_front);
 
@@ -121,7 +116,7 @@ dice_tui_status_t dice_tui_render(void)
     return DICE_TUI_OK;
 }
 
-dice_tui_status_t dice_tui_clear(void)
+ae2f_inline dice_tui_status_t dice_tui_clear(void)
 {
     size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
 
