@@ -11,16 +11,17 @@ dice_tui_ctx_t dice_tui_ctx = {0};
 
 dice_tui_status_t dice_tui_get_size(void)
 {
-    _ae2fsys_get_trm_size_simple_imp(L,dice_tui_ctx.m_width,dice_tui_ctx.m_height);
+    _ae2fsys_get_trm_size_simple_imp(L, dice_tui_ctx.m_width, dice_tui_ctx.m_height);
 
-    if (dice_tui_ctx.m_width == 0 || dice_tui_ctx.m_height == 0) {
+    ae2f_unexpected_but_if(dice_tui_ctx.m_width == 0 || dice_tui_ctx.m_height == 0) {
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
-    
+
     {
-        size_t w = (size_t)dice_tui_ctx.m_width;
-        size_t h = (size_t)dice_tui_ctx.m_height;
-        if (h != 0 && w > SIZE_MAX / h) {
+        const size_t w = (size_t)dice_tui_ctx.m_width;
+        const size_t h = (size_t)dice_tui_ctx.m_height;
+
+        ae2f_unexpected_but_if(h != 0 && w > SIZE_MAX / h) {
             return DICE_TUI_ERR_WINDOW_SIZE;
         }
     }
@@ -31,11 +32,11 @@ dice_tui_status_t dice_tui_init(void)
 {
     size_t total, width, height;
 
-    if (dice_tui_ctx.m_front) {
+    ae2f_unexpected_but_if(dice_tui_ctx.m_front) {
         return DICE_TUI_INIT_RECALL;
     }
 
-    if (dice_tui_get_size() != DICE_TUI_OK) {
+    ae2f_unexpected_but_if(dice_tui_get_size() != DICE_TUI_OK) {
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
@@ -43,7 +44,6 @@ dice_tui_status_t dice_tui_init(void)
     height = (size_t)dice_tui_ctx.m_height;
 
     total = width * height;
-
     dice_tui_ctx.m_front = stdout;
 
     _ae2fsys_clear_trm_simple_imp(L);
@@ -52,11 +52,11 @@ dice_tui_status_t dice_tui_init(void)
     dice_tui_ctx.m_back = malloc(total);
     dice_tui_ctx.m_prev = malloc(total);
 
-    if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
+    ae2f_unexpected_but_if(!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
         free(dice_tui_ctx.m_back);
         free(dice_tui_ctx.m_prev);
 
-        memset(&dice_tui_ctx, 0, sizeof dice_tui_ctx);
+        memset(&dice_tui_ctx, 0, sizeof (dice_tui_ctx));
         return DICE_TUI_ERR_MEMORY_ALLOC;
     }
     
@@ -71,15 +71,15 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 {
     size_t idx;
 
-    if (!dice_tui_ctx.m_back) {
+    ae2f_unexpected_but_if(!dice_tui_ctx.m_back) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
-    if (x < 0 || y < 0) {
+    ae2f_unexpected_but_if(x < 0 || y < 0) {
         return DICE_TUI_ERR_INVALID_INPUT;
     }
 
-    if ((ae2fsys_trmpos_t)x >= dice_tui_ctx.m_width || (ae2fsys_trmpos_t)y >= dice_tui_ctx.m_height) {
+    ae2f_unexpected_but_if((ae2fsys_trmpos_t)x >= dice_tui_ctx.m_width || (ae2fsys_trmpos_t)y >= dice_tui_ctx.m_height) {
         return DICE_TUI_ERR_OUT_OF_BOUNDS;
     }
 
@@ -91,22 +91,12 @@ dice_tui_status_t dice_tui_set_char(int x, int y, char c)
 
 dice_tui_status_t dice_tui_render(void)
 {
-    size_t total, width, height, i;
+    const size_t width  = (size_t)dice_tui_ctx.m_width;
+    const size_t height = (size_t)dice_tui_ctx.m_height;
+    size_t i, total;
 
-    if (!dice_tui_ctx.m_front || !dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
+    ae2f_unexpected_but_if(!dice_tui_ctx.m_front || !dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
         return DICE_TUI_ERR_NULL_POINTER;
-    }
-
-    width  = (size_t)dice_tui_ctx.m_width;
-    height = (size_t)dice_tui_ctx.m_height;
-
-    {
-        size_t w = (size_t)dice_tui_ctx.m_width;
-        size_t h = (size_t)dice_tui_ctx.m_height;
-
-        if (h != 0 && w > SIZE_MAX / h) {
-            return DICE_TUI_ERR_WINDOW_SIZE;
-        }
     }
 
     total = width * height;
@@ -118,8 +108,8 @@ dice_tui_status_t dice_tui_render(void)
             size_t y = i / width;
             size_t x = i % width;
             
-            _ae2fsys_trm_goto_simple_imp(L, (int)(x + 1), (int)(y + 1));
-            
+            _ae2fsys_trm_goto_simple_imp(L, (ae2fsys_trmpos_t)(x + 1), (ae2fsys_trmpos_t)(y + 1));
+
             fputc(nb, dice_tui_ctx.m_front);
 
             dice_tui_ctx.m_prev[i] = nb;
@@ -131,31 +121,24 @@ dice_tui_status_t dice_tui_render(void)
     return DICE_TUI_OK;
 }
 
+dice_tui_status_t dice_tui_clear(void)
+{
+    size_t total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
+
+    ae2f_unexpected_but_if(!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
+        return DICE_TUI_ERR_NULL_POINTER;
+    }
+
+    memset(dice_tui_ctx.m_back, ' ', total);
+    memset(dice_tui_ctx.m_prev, '\0', total);
+
+    return DICE_TUI_OK;
+}
+
 void dice_tui_shutdown(void)
 {
     free(dice_tui_ctx.m_back);
     free(dice_tui_ctx.m_prev);
 
-    memset(&dice_tui_ctx, 0, sizeof dice_tui_ctx);
-}
-
-dice_tui_status_t dice_tui_clear(void)
-{
-    size_t w = (size_t)dice_tui_ctx.m_width;
-    size_t h = (size_t)dice_tui_ctx.m_height;
-    size_t total;
-
-    if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
-        return DICE_TUI_ERR_NULL_POINTER;
-    }
-
-    if (h != 0 && w > SIZE_MAX / h) {
-        return DICE_TUI_ERR_WINDOW_SIZE;
-    }
-
-    total = w * h;
-    memset(dice_tui_ctx.m_back, ' ', total);
-    memset(dice_tui_ctx.m_prev, '\0', total);
-
-    return DICE_TUI_OK;
+    memset(&dice_tui_ctx, 0, sizeof(dice_tui_ctx));
 }

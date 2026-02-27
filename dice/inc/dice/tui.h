@@ -3,10 +3,8 @@
 
 #include <ae2f/Sys/Trm.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stddef.h>
-#include "dice/tui/err.h"
+#include "./tui/err.h"
 
 typedef struct {
     ae2fsys_trmpos_t m_width;
