@@ -25,5 +25,4 @@ dice_tui_status_t dice_tui_render(void);
 dice_tui_status_t dice_tui_clear(void);
 
 void dice_tui_shutdown(void);
-
 #endif

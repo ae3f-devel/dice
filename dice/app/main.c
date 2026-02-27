@@ -20,20 +20,26 @@ static void restore_term(void)
 int main(void)
 {
     char text[] = "Hello, World";
-    int i = 0;
+    size_t i;
+    size_t len;
+    int cx, cy;
     int ch;
 
     if (dice_tui_init() != DICE_TUI_OK) {
         return 1;
     }
 
-    for(i = 0;i<12;i++){
-        dice_tui_set_char(dice_tui_ctx.m_width / 2 - 6 + i, dice_tui_ctx.m_height / 2, text[i]);
+    len = sizeof text - 1;
+    cx = (int)dice_tui_ctx.m_width / 2 - (int)len / 2;
+    cy = (int)dice_tui_ctx.m_height / 2;
+
+    for (i = 0; i < len; ++i) {
+        dice_tui_set_char(cx + (int)i, cy, text[i]);
     }
 
     dice_tui_render();
 
-#if defined(_WIN32)
+#if ae2f_Sys_WIN(!)0
     {
         HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
         DWORD mode;

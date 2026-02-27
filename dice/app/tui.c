@@ -16,8 +16,7 @@ dice_tui_status_t dice_tui_get_size(void)
     if (dice_tui_ctx.m_width == 0 || dice_tui_ctx.m_height == 0) {
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
-
-    /* overflow check using unsigned arithmetic to avoid sign warnings */
+    
     {
         size_t w = (size_t)dice_tui_ctx.m_width;
         size_t h = (size_t)dice_tui_ctx.m_height;
