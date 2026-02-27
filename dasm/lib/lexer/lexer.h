@@ -8,7 +8,7 @@
 #include <dasm/err.h>
 #include <libdice/abi.h>
 #include <libdice/type.h>
-#include "toks.h"
+#include "./toks.h"
 
 enum DASM_LEXER_STATE_ {
 	DASM_LEXER_STATE_IDLE,
@@ -23,14 +23,14 @@ struct dasm_lexer {
 	libdice_word_t m_src_len;
 	libdice_word_t m_src_cnt;
 
-	struct dasm_tok_stream m_tok_stream;
+	struct dasm_tok_stream *m_tok_stream;
 	const char *m_src;
-
+	
 	enum DASM_LEXER_STATE_ m_state;
 };
 
 /**
- * @brief 
+ * @brief Should initialize 'rdwr_tok_stream' before calling dasm_lexer_init()
  * 
  * @param rdwr_lexer 
  * @param rdwr_toks 
@@ -39,8 +39,7 @@ struct dasm_lexer {
  * @param c_src_len 
  * @return bool Returns true on success and false on failure.
  */
-DICECALL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer,
-	struct dasm_tok rdwr_toks[], const libdice_word_t c_tokens_len,
+DICECALL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok_stream *rdwr_tok_stream,
 	const char rd_src[], const libdice_word_t c_src_len);
 
 /**

@@ -1,4 +1,4 @@
-#include "toks.h"
+#include "./toks.h"
 #include <stddef.h>
 #include <stdlib.h>
 
