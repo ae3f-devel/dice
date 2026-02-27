@@ -14,12 +14,14 @@
 
 int main(void)
 {
+
+	struct dasm_tok_stream *tok_stream = NULL;
+
 	enum DASM_ERR_ err;
 	struct dasm_pp pp;
 	char dst[100] = {0,};
 	const char src[100] = PROGRAMME;
 
-	struct dasm_tok_stream tstream;
 	struct dasm_tok toks[100];
 
 	struct dasm_lexer lexer;
@@ -34,12 +36,7 @@ int main(void)
 		exit(1);
 	}
 
-	if (!dasm_tok_stream_init(&tstream, toks, 100)) {
-		printf("[ERROR2]\n");
-		exit(1);
-	}
-
-	if (!dasm_lexer_init(&lexer, &tstream, pp.m_dst, pp.m_dst_cnt)) {
+	if (!dasm_lexer_init(&lexer, toks, 100, pp.m_dst, pp.m_dst_cnt)) {
 		printf("[ERROR3]\n");
 		exit(1);
 	}
@@ -49,7 +46,10 @@ int main(void)
 		exit(1);
 	}
 
-	if (!dasm_tok_stream_seek(lexer.m_tok_stream, 0, DASM_TOK_STREAM_WHENCE_SET)) {
+
+	tok_stream = &lexer.m_tok_stream;
+
+	if (!dasm_tok_stream_seek(tok_stream, 0, DASM_TOK_STREAM_WHENCE_SET)) {
 		printf("[ERROR5]\n");
 		exit(1);
 	}
@@ -58,7 +58,7 @@ int main(void)
 		struct dasm_tok *tok;
 		libdice_word_t i;
 
-		tok = dasm_tok_stream_peek(lexer.m_tok_stream);
+		tok = dasm_tok_stream_peek(tok_stream);
 		if (!tok) {
 			printf("[ERROR6]\n");
 			break;
@@ -69,11 +69,10 @@ int main(void)
 		}
 		printf("\t tok_type = %u\n", tok->m_tok_type);
 
-	} while (dasm_tok_stream_advance(lexer.m_tok_stream));
+	} while (dasm_tok_stream_advance(tok_stream));
 
 	dasm_pp_deinit(&pp);
 	dasm_lexer_deinit(&lexer);
-	dasm_tok_stream_deinit(&tstream);
 
 	return 0;
 }

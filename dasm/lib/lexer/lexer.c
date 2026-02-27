@@ -6,10 +6,10 @@
 #include <stdlib.h>
 
 
-DICEIMPL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok_stream *rdwr_tok_stream,
-	const char rd_src[], const libdice_word_t c_src_len)
+DICEIMPL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok rdwr_toks[],
+	const libdice_word_t c_toks_len, const char rd_src[], const libdice_word_t c_src_len)
 {
-	if (!rdwr_lexer || !rdwr_tok_stream || !rd_src) {
+	if (!rdwr_lexer || !rdwr_toks || !rd_src) {
 		return false;
 	}
 
@@ -17,7 +17,9 @@ DICEIMPL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok_str
 	rdwr_lexer->m_src_len = c_src_len;
 	rdwr_lexer->m_src_cnt = 0;
 
-	rdwr_lexer->m_tok_stream = rdwr_tok_stream;
+	if (!dasm_tok_stream_init(&rdwr_lexer->m_tok_stream, rdwr_toks, c_toks_len)) {
+		return false;
+	}
 
 	rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
 
@@ -34,7 +36,7 @@ DICEIMPL bool dasm_lexer_deinit(struct dasm_lexer *rdwr_lexer)
 	rdwr_lexer->m_src_len = 0;
 	rdwr_lexer->m_src_cnt = 0;
 
-	rdwr_lexer->m_tok_stream = NULL;
+	dasm_tok_stream_deinit(&rdwr_lexer->m_tok_stream);
 
 	rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
 
@@ -52,7 +54,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 		return DASM_ERR_UNKNOWN;
 	}
 
-	while (rdwr_lexer->m_tok_stream->m_tok_cnt < rdwr_lexer->m_tok_stream->m_toks_len
+	while (rdwr_lexer->m_tok_stream.m_tok_cnt < rdwr_lexer->m_tok_stream.m_toks_len
 		&& rdwr_lexer->m_src_cnt < rdwr_lexer->m_src_len) {
 
 		lexeme = &(rdwr_lexer->m_src[rdwr_lexer->m_src_cnt]);
@@ -69,9 +71,9 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_CHAR_IMM;
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_CHAR_IMM);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_CHAR_IMM);
 				
 				rdwr_lexer->m_src_cnt++;
 
@@ -79,9 +81,9 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_STRING_IMM;
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_STRING_IMM);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_STRING_IMM);
 
 				rdwr_lexer->m_src_cnt++;
 
@@ -89,17 +91,17 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_STAR;
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_STAR);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_STAR);
 
 				rdwr_lexer->m_src_cnt++;
 
 			} else if (ch == '\n') {
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_EOL);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_EOL);
 
 				rdwr_lexer->m_src_cnt++;
 
@@ -107,9 +109,9 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 			} else if (ch == '\0') {
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_EOP);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_EOP);
 
 				rdwr_lexer->m_src_cnt++;
 
@@ -119,9 +121,9 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDENT;
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_IDENT);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_IDENT);
 
 				rdwr_lexer->m_src_cnt++;
 
@@ -129,25 +131,25 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 
 				rdwr_lexer->m_state = DASM_LEXER_STATE_INT_IMM;
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_INT_IMM);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_INT_IMM);
 
 				rdwr_lexer->m_src_cnt++;
 
 			} else if (ch == ',') {
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_COMMA);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_COMMA);
 
 				rdwr_lexer->m_src_cnt++;
 
 			} else if (ch == ':') {
 
-				dasm_tok_stream_append(rdwr_lexer->m_tok_stream);
-				dasm_tok_stream_set_lexeme(rdwr_lexer->m_tok_stream, lexeme, 1);
-				dasm_tok_stream_set_type(rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_COLON);
+				dasm_tok_stream_append(&rdwr_lexer->m_tok_stream);
+				dasm_tok_stream_set_lexeme(&rdwr_lexer->m_tok_stream, lexeme, 1);
+				dasm_tok_stream_set_type(&rdwr_lexer->m_tok_stream, DASM_TOK_TYPE_COLON);
 
 				rdwr_lexer->m_src_cnt++;
 				
@@ -159,7 +161,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 		case DASM_LEXER_STATE_IDENT:
 
 			if (isalnum(ch) || ch == '_') {
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 			} else {
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
@@ -169,7 +171,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 		case DASM_LEXER_STATE_INT_IMM:
 
 			if (isdigit(ch)) {
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 			} else {
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
@@ -183,7 +185,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 				if (char_verification_cnt != 1) {
 					return DASM_ERR_INVAL_CHAR_IMM;
 				}
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
 				break;
@@ -194,7 +196,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 			default:
 				char_verification_cnt++;
 
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				break;
 			}
@@ -205,7 +207,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 			switch (ch) {
 			case '\"':
 
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
 				break;
@@ -215,7 +217,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 				return DASM_ERR_INVAL_STRING_IMM;
 			default:
 
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 				break;
 
@@ -225,7 +227,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 		case DASM_LEXER_STATE_STAR:
 
 			if (ch == '*') {
-				dasm_tok_stream_increase_lexeme_len(rdwr_lexer->m_tok_stream, 1);
+				dasm_tok_stream_increase_lexeme_len(&rdwr_lexer->m_tok_stream, 1);
 				rdwr_lexer->m_src_cnt++;
 			} else {
 				rdwr_lexer->m_state = DASM_LEXER_STATE_IDLE;
@@ -237,7 +239,7 @@ static ae2f_inline enum DASM_ERR_ dasm_lexer_execute_line(struct dasm_lexer *rdw
 		}
 	}
 
-	if (rdwr_lexer->m_tok_stream->m_tok_cnt == rdwr_lexer->m_tok_stream->m_toks_len) {
+	if (rdwr_lexer->m_tok_stream.m_tok_cnt == rdwr_lexer->m_tok_stream.m_toks_len) {
 		return DASM_ERR_MEM_INSUF;
 	}
 
@@ -256,7 +258,7 @@ DICEIMPL enum DASM_ERR_ dasm_lexer_execute(struct dasm_lexer *rdwr_lexer)
 		return DASM_ERR_UNKNOWN;
 	}
 
-	while (rdwr_lexer->m_tok_stream->m_tok_cnt < rdwr_lexer->m_tok_stream->m_toks_len
+	while (rdwr_lexer->m_tok_stream.m_tok_cnt < rdwr_lexer->m_tok_stream.m_toks_len
 		&& rdwr_lexer->m_src_cnt < rdwr_lexer->m_src_len) {
 
 		err = dasm_lexer_execute_line(rdwr_lexer);

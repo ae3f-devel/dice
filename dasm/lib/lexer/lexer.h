@@ -23,7 +23,7 @@ struct dasm_lexer {
 	libdice_word_t m_src_len;
 	libdice_word_t m_src_cnt;
 
-	struct dasm_tok_stream *m_tok_stream;
+	struct dasm_tok_stream m_tok_stream;
 	const char *m_src;
 	
 	enum DASM_LEXER_STATE_ m_state;
@@ -39,8 +39,8 @@ struct dasm_lexer {
  * @param c_src_len 
  * @return bool Returns true on success and false on failure.
  */
-DICECALL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok_stream *rdwr_tok_stream,
-	const char rd_src[], const libdice_word_t c_src_len);
+DICECALL bool dasm_lexer_init(struct dasm_lexer *rdwr_lexer, struct dasm_tok rdwr_toks[],
+	const libdice_word_t c_toks_len, const char rd_src[], const libdice_word_t c_src_len);
 
 /**
  * @brief 

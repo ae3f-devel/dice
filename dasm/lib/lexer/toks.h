@@ -1,6 +1,3 @@
-
-
-
 #ifndef dasm_toks_h
 #define dasm_toks_h
 
