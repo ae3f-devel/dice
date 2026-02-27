@@ -80,20 +80,18 @@ static struct {
 
 static ae2f_inline bool dasm_lexer_is_tok_mnemonic(const char rd_str[], const libdice_word_t c_str_len)
 {
-	libdice_word_t i = 0;
+	libdice_word_t i;
 
 	if (!rd_str) {
 		return false;
 	}
 
-	for (i=0; i<DASM_MNEMONIC_CNT; ++i) {
+	for (i = 0; i < DASM_MNEMONIC_CNT; ++i) {
 		if (s_mnemonics[i].m_str_len == c_str_len
 			&& !strncmp(rd_str, s_mnemonics[i].m_str, c_str_len)) {
 			return true;
 		}
 	}
-
-	
 
 	return false;
 }
