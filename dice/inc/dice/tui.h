@@ -22,12 +22,8 @@ dice_tui_status_t dice_tui_get_size(void);
 dice_tui_status_t dice_tui_init(void);
 dice_tui_status_t dice_tui_set_char(int x, int y, char c);
 dice_tui_status_t dice_tui_render(void);
+dice_tui_status_t dice_tui_clear(void);
 
-/*
- * Free any resources allocated by the library.  The implementation is a no-op
- * if the context has not been initialised; callers may invoke this before
- * exiting or prior to a second call to dice_tui_init().
- */
 void dice_tui_shutdown(void);
 
 #endif
