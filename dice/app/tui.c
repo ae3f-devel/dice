@@ -56,7 +56,7 @@ dice_tui_status_t dice_tui_init(void)
         free(dice_tui_ctx.m_back);
         free(dice_tui_ctx.m_prev);
 
-        memset(&dice_tui_ctx, 0, sizeof (dice_tui_ctx));
+        memset(&dice_tui_ctx, 0, sizeof(dice_tui_ctx));
         return DICE_TUI_ERR_MEMORY_ALLOC;
     }
     
