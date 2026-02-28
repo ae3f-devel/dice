@@ -1,11 +1,10 @@
 #include "dice/tui.h"
 
 #include <ae2f/Sys/Trm.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
 #include <stdint.h>
+#include <stddef.h>
 
 dice_tui_ctx_t dice_tui_ctx = {0};
 
@@ -111,7 +110,7 @@ dice_tui_status_t dice_tui_resize(void) {
     return DICE_TUI_OK;
 }
 
-ae2f_inline dice_tui_status_t dice_tui_set_char(int x, int y, char c) {
+ae2f_inline dice_tui_status_t dice_tui_set_char(ae2fsys_trmpos_t x, ae2fsys_trmpos_t y, char c) {
     size_t idx;
 
     if (!dice_tui_ctx.m_back) {
@@ -134,7 +133,7 @@ ae2f_inline dice_tui_status_t dice_tui_set_char(int x, int y, char c) {
 
 ae2f_inline dice_tui_status_t dice_tui_render(void) {
     size_t x, y, width, height;
-    if (!dice_tui_ctx.m_front || !dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
+    if (!(dice_tui_ctx.m_front && dice_tui_ctx.m_back && dice_tui_ctx.m_prev)) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
@@ -168,7 +167,7 @@ ae2f_inline dice_tui_status_t dice_tui_render(void) {
 
 ae2f_inline dice_tui_status_t dice_tui_clear(void) {
     size_t total;
-    if (!dice_tui_ctx.m_back || !dice_tui_ctx.m_prev) {
+    if (!(dice_tui_ctx.m_back && dice_tui_ctx.m_prev)) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 

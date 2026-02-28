@@ -20,7 +20,7 @@ static void restore_term(void)
 int main(void)
 {
     char text[] = "Hello, World";
-    size_t i, len = sizeof(text) - 1;
+    int i, len = (int)sizeof(text) - 1; 
     int ch;
 
     if (dice_tui_init() != DICE_TUI_OK) {
@@ -28,7 +28,10 @@ int main(void)
     }
 
     for (i = 0; i < len; ++i) {
-        dice_tui_set_char((int)dice_tui_ctx.m_width / 2 - (int)len / 2 + (int)i, (int)dice_tui_ctx.m_height / 2, text[i]);
+        int x = (int)(dice_tui_ctx.m_width / 2) - (len / 2) + i;
+        int y = (int)(dice_tui_ctx.m_height / 2);
+        
+        dice_tui_set_char((ae2fsys_trmpos_t)x, (ae2fsys_trmpos_t)y, text[i]);
     }
 
     dice_tui_render();
@@ -56,11 +59,11 @@ int main(void)
         ch = _getch();
 #else
         ch = getchar();
-
+#endif
         if (ch == EOF) {
             break;
         }
-#endif
+
         if (ch == 'q') {
             dice_tui_clear();
             dice_tui_render();
