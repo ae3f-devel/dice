@@ -1,6 +1,6 @@
 #include <ae2f/cc.h>
-#include "pp.h"
-#include "dasm/err.h"
+#include "./pp.h"
+#include <dasm/err.h>
 #include <stdlib.h>
 
 DICEIMPL bool dasm_pp_init(struct dasm_pp *rdwr_pp, 
@@ -24,10 +24,10 @@ DICEIMPL bool dasm_pp_init(struct dasm_pp *rdwr_pp,
         return true;
 }
 
-DICEIMPL bool dasm_pp_deinit(struct dasm_pp *rdwr_pp)
+DICEIMPL void dasm_pp_deinit(struct dasm_pp *rdwr_pp)
 {
         if (!rdwr_pp) {
-                return false; 
+                return; 
         }
 
 	rdwr_pp->m_dst = NULL;
@@ -39,8 +39,6 @@ DICEIMPL bool dasm_pp_deinit(struct dasm_pp *rdwr_pp)
 	rdwr_pp->m_src_cnt = 0;
 
 	rdwr_pp->m_state = DASM_PP_STATE_NORMAL;
-
-        return true;
 }
 
 DICEIMPL bool dasm_pp_reset_dst(struct dasm_pp *rdwr_pp, 
