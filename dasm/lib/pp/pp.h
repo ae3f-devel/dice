@@ -53,13 +53,7 @@ DICECALL bool dasm_pp_init(struct dasm_pp *rdwr_pp,
 	char rdwr_dst[], const libdice_word_t c_dst_len, 
 	const char rd_src[], const libdice_word_t c_src_len);
 
-/**
- * @brief 
- * 
- * @param rdwr_pp 
- * @return bool Returns true on success and false on failure. 
- */
-DICECALL bool dasm_pp_deinit(struct dasm_pp *rdwr_pp);
+DICECALL void dasm_pp_deinit(struct dasm_pp *rdwr_pp);
 
 DICECALL enum DASM_ERR_ dasm_pp_execute(struct dasm_pp *rdwr_pp);
 
