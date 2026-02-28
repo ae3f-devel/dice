@@ -14,7 +14,7 @@ static dice_tui_status_t dice_tui_realloc_buffers(size_t total) {
 
     new_back = malloc(total);
     new_prev = malloc(total);
-    if (!new_back || !new_prev) {
+    if (!(new_back && new_prev)) {
         free(new_back);
         free(new_prev);
         return DICE_TUI_ERR_MEMORY_ALLOC;
