@@ -8,7 +8,7 @@
 typedef struct {
     ae2fsys_trmpos_t m_width;
     ae2fsys_trmpos_t m_height;
-    FILE* m_front;
+    int m_init_flag;
     char* m_back;
     char* m_prev;
 } dice_tui_ctx_t;

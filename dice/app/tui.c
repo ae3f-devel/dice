@@ -9,51 +9,41 @@
 dice_tui_ctx_t dice_tui_ctx = {0};
 
 static dice_tui_status_t dice_tui_realloc_buffers(size_t total) {
-    void *tmp_back, *tmp_prev;
+    char *new_back = NULL;
+    char *new_prev = NULL;
 
-    tmp_back = realloc(dice_tui_ctx.m_back, total);
-    tmp_prev = realloc(dice_tui_ctx.m_prev, total);
-
-    if (!tmp_back || !tmp_prev) {
-        if (tmp_back) {
-            free(tmp_back);
-        } else {
-            free(dice_tui_ctx.m_back);
-        }
-
-        if (tmp_prev) {
-            free(tmp_prev);
-        } else {
-            free(dice_tui_ctx.m_prev);
-        }
-
-        dice_tui_ctx.m_back = NULL;
-        dice_tui_ctx.m_prev = NULL;
-
+    new_back = malloc(total);
+    new_prev = malloc(total);
+    if (!new_back || !new_prev) {
+        free(new_back);
+        free(new_prev);
         return DICE_TUI_ERR_MEMORY_ALLOC;
     }
 
-    dice_tui_ctx.m_back = (char *)tmp_back;
-    dice_tui_ctx.m_prev = (char *)tmp_prev;
+    memset(new_back, ' ', total);
+    memset(new_prev, '\0', total);
 
-    memset(dice_tui_ctx.m_back, ' ', total);
-    memset(dice_tui_ctx.m_prev, '\0', total);
+    free(dice_tui_ctx.m_back);
+    free(dice_tui_ctx.m_prev);
+    dice_tui_ctx.m_back = new_back;
+    dice_tui_ctx.m_prev = new_prev;
 
     return DICE_TUI_OK;
 }
 
 dice_tui_status_t dice_tui_get_size(void) {
     size_t w, h;
-    _ae2fsys_get_trm_size_simple_imp(L, dice_tui_ctx.m_width, dice_tui_ctx.m_height);
 
-    if (dice_tui_ctx.m_width <= 0 || dice_tui_ctx.m_height <= 0) {
-        return DICE_TUI_ERR_WINDOW_SIZE;
-    }
+    _ae2fsys_get_trm_size_simple_imp(L, dice_tui_ctx.m_width, dice_tui_ctx.m_height);
 
     w = (size_t)dice_tui_ctx.m_width;
     h = (size_t)dice_tui_ctx.m_height;
 
-    if (h != 0 && w > (size_t)-1 / h) {
+    if (w <= 0 || h <= 0) {
+        return DICE_TUI_ERR_WINDOW_SIZE;
+    }
+
+    if(w * h < w || w * h < h){
         return DICE_TUI_ERR_WINDOW_SIZE;
     }
 
@@ -63,23 +53,28 @@ dice_tui_status_t dice_tui_get_size(void) {
 dice_tui_status_t dice_tui_init(void) {
     dice_tui_status_t status;
     size_t total;
+    size_t w = (size_t)dice_tui_ctx.m_width, h = (size_t)dice_tui_ctx.m_height;
 
-    if (dice_tui_ctx.m_front) {
+    if (dice_tui_ctx.m_init_flag) {
         return DICE_TUI_INIT_RECALL;
     }
 
+    if(w * h < w || w * h < h){
+        return DICE_TUI_ERR_WINDOW_SIZE;
+    }
+
     status = dice_tui_get_size();
+
     if (status != DICE_TUI_OK) {
         return status;
     }
 
-    total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
-    dice_tui_ctx.m_front = stdout;
+    total = (size_t)w * (size_t)h;
 
     _ae2fsys_clear_trm_simple_imp(L);
-    fflush(dice_tui_ctx.m_front);
 
     status = dice_tui_realloc_buffers(total);
+
     if (status != DICE_TUI_OK) {
         memset(&dice_tui_ctx, 0, sizeof(dice_tui_ctx));
         return status;
@@ -133,7 +128,8 @@ ae2f_inline dice_tui_status_t dice_tui_set_char(ae2fsys_trmpos_t x, ae2fsys_trmp
 
 ae2f_inline dice_tui_status_t dice_tui_render(void) {
     size_t x, y, width, height;
-    if (!(dice_tui_ctx.m_front && dice_tui_ctx.m_back && dice_tui_ctx.m_prev)) {
+
+    if (!(dice_tui_ctx.m_init_flag && dice_tui_ctx.m_back && dice_tui_ctx.m_prev)) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
@@ -153,26 +149,28 @@ ae2f_inline dice_tui_status_t dice_tui_render(void) {
                     _ae2fsys_trm_goto_simple_imp(L, (ae2fsys_trmpos_t)(x + 1), (ae2fsys_trmpos_t)(y + 1));
                     cursor_set = 1;
                 }
-                fputc(nb, dice_tui_ctx.m_front);
+                fputc(nb, stdout);
                 dice_tui_ctx.m_prev[i] = nb;
             } else {
                 cursor_set = 0;
             }
         }
     }
-    fflush(dice_tui_ctx.m_front);
+    fflush(stdout);
 
     return DICE_TUI_OK;
 }
 
 ae2f_inline dice_tui_status_t dice_tui_clear(void) {
     size_t total;
+
     if (!(dice_tui_ctx.m_back && dice_tui_ctx.m_prev)) {
         return DICE_TUI_ERR_NULL_POINTER;
     }
 
     total = (size_t)dice_tui_ctx.m_width * (size_t)dice_tui_ctx.m_height;
     memset(dice_tui_ctx.m_back, ' ', total);
+    memset(dice_tui_ctx.m_prev, '\0', total);
 
     return DICE_TUI_OK;
 }

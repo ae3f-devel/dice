@@ -5,6 +5,14 @@
 #if ae2f_Sys_WIN(!)0
 #include <windows.h>
 #include <conio.h>
+
+static DWORD orig_console_mode;
+
+static void restore_console(void)
+{
+    HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+    SetConsoleMode(h, orig_console_mode);
+}
 #else
 #include <termios.h>
 #include <unistd.h>
@@ -42,6 +50,8 @@ int main(void)
         DWORD mode;
 
         GetConsoleMode(h, &mode);
+        orig_console_mode = mode;
+        atexit(restore_console);
         SetConsoleMode(h, mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
     }
 #else
