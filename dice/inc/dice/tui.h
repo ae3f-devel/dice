@@ -18,6 +18,7 @@ extern dice_tui_ctx_t dice_tui_ctx;
 
 dice_tui_status_t dice_tui_get_size(void);
 dice_tui_status_t dice_tui_init(void);
+dice_tui_status_t dice_tui_resize(void);
 ae2f_inline dice_tui_status_t dice_tui_set_char(int x, int y, char c);
 ae2f_inline dice_tui_status_t dice_tui_render(void);
 ae2f_inline dice_tui_status_t dice_tui_clear(void);
