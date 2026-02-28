@@ -38,6 +38,7 @@ add_executable(dice
 	${dice_inc}
 	${dice_lib}
 	)
+
 ae2f_UltraErrWERROR(dice PRIVATE)
 
 target_link_libraries(dice ae3f::rolladie)
